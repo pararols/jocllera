@@ -1,0 +1,522 @@
+:root {
+  /* Simplexity Palette - Good (Organic/Earth) */
+  --color-earth-dark: #8c6b3e;
+  --color-earth-mid: #d4a76a;
+  --color-earth-light: #f3e5ab;
+  --color-life-green: #6b8c42;
+  --color-sky-blue: #87ceeb;
+
+  /* Simplexity Palette - Bad (Industrial/Metal) */
+  --color-metal-dark: #2c3e50;
+  --color-metal-mid: #7f8c8d;
+  --color-metal-light: #bdc3c7;
+  --color-neon-purple: #9b59b6;
+  --color-neon-blue: #3498db;
+
+  /* UI Variables */
+  --font-main: 'Outfit', sans-serif;
+  /* Example modern font */
+  --border-radius: 12px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main), system-ui, -apple-system, sans-serif;
+  background-color: var(--color-earth-light);
+  color: var(--color-metal-dark);
+  transition: background-color 0.5s ease;
+  overflow: hidden;
+  /* Prevent scroll */
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-container,
+.map-wrapper {
+  flex-grow: 1;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* Speculation Shader Effect */
+.speculation-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* CRITICAL: Allows clicks to pass through to the map */
+  background: radial-gradient(circle, transparent 50%, rgba(44, 62, 80, 0.8) 100%);
+  z-index: 400;
+  /* Below HUD (1000) but above Map (1) */
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+  mix-blend-mode: multiply;
+}
+
+.speculation-active {
+  opacity: 1;
+  /* Make it fully visible when active */
+}
+
+/* Pulsing effect for Good Energy Nodes */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}
+
+.pulsing-node {
+  animation: pulse 2s infinite;
+}
+
+/* Floating Feedback Animation */
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.5) translateY(-100px);
+  }
+}
+
+.floating-feedback {
+  position: absolute;
+  pointer-events: none;
+  animation: floatUp 3s ease-out forwards;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 2000;
+}
+
+.feedback-money {
+  color: #2ecc71;
+  /* Green Money */
+  font-size: 2.5rem;
+}
+
+.feedback-co2 {
+  color: #7f8c8d;
+  /* Grey CO2 */
+  font-size: 1.8rem;
+}
+
+.feedback-bad {
+  color: #e74c3c;
+  /* Red Money Loss */
+  font-size: 1.8rem;
+}
+
+.feedback-damage {
+  color: #e67e22;
+  /* Orange Damage */
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.feedback-defeat {
+  color: #3498db;
+  /* Neon Blue */
+  font-size: 2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+/* =========================================
+   RESOURCE HUD (LEFT SIDE)
+   ========================================= */
+.resource-hud {
+  position: absolute;
+  top: 80px;
+  left: 20px;
+  z-index: 1000;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  width: 250px;
+  font-family: var(--font-main);
+}
+
+.resource-hud h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 5px;
+}
+
+.resource-item {
+  margin-bottom: 15px;
+}
+
+.resource-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  color: #7f8c8d;
+  font-weight: bold;
+}
+
+.resource-bar-container {
+  width: 100%;
+  height: 12px;
+  background: #ecf0f1;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.resource-bar {
+  height: 100%;
+  transition: width 0.5s ease-out;
+}
+
+.bar-money {
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+}
+
+.bar-co2 {
+  background: linear-gradient(90deg, #95a5a6, #7f8c8d);
+}
+
+/* =========================================
+   NODE INFO CARD (CUSTOM POPUP)
+   ========================================= */
+.node-info-card {
+  position: absolute;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  width: 200px;
+  text-align: center;
+  transform: translateX(-50%);
+  /* Center horizontally relative to left position */
+  font-family: var(--font-main);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.node-info-card h3 {
+  margin: 0 0 5px 0;
+  font-size: 1rem;
+  color: #2c3e50;
+}
+
+.node-info-close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  cursor: pointer;
+  color: #95a5a6;
+  font-size: 0.8rem;
+  font-weight: bold;
+  padding: 2px 6px;
+}
+
+.node-info-close:hover {
+  color: #e74c3c;
+}
+
+/* =========================================
+   MODALS & UI
+   ========================================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(44, 62, 80, 0.9);
+  /* Dark background */
+  z-index: 2000;
+  /* Above everything */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: #f3e5ab;
+  /* Earth Light */
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 4px solid #8c6b3e;
+  /* Earth Dark */
+  position: relative;
+}
+
+.modal-content.victory {
+  background: #d4efff;
+  /* Skyish */
+  border-color: #3498db;
+}
+
+.modal-content h2 {
+  font-size: 2rem;
+  margin-top: 0;
+  color: #8c6b3e;
+  /* Earth Dark */
+  font-family: serif;
+  /* More literary feel */
+}
+
+.modal-content.victory h2 {
+  color: #2980b9;
+}
+
+.modal-content p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #2c3e50;
+}
+
+.modal-content .quote {
+  font-style: italic;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #d35400;
+}
+
+.modal-content button {
+  background: #8c6b3e;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: bold;
+  box-shadow: 0 4px 0 #5d4526;
+}
+
+.modal-content button:hover {
+  background: #a07a46;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #5d4526;
+}
+
+.modal-content button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 0 #5d4526;
+}
+
+.modal-content.victory button {
+  background: #3498db;
+  box-shadow: 0 4px 0 #2980b9;
+}
+
+/* --- Minigame Styles --- */
+.minigame-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.6);
+  /* Modern dark overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  /* Extremely high to beat map filters */
+  backdrop-filter: blur(8px);
+  /* Deeper blur */
+  animation: fadeIn 0.3s ease-out;
+}
+
+.minigame-card {
+  background: rgba(44, 62, 80, 0.85);
+  width: 95%;
+  max-width: 1000px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  /* Subtle border */
+  border: 1px solid rgba(52, 152, 219, 0.5);
+  backdrop-filter: blur(12px);
+  /* Glassmorphism on card */
+  transform: translateZ(0);
+  /* Hardware accelerate */
+}
+
+.minigame-header {
+  background: rgba(52, 73, 94, 0.9);
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  border-bottom: 1px solid rgba(52, 152, 219, 0.3);
+}
+
+.minigame-header h3 {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  /* Tech feel */
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, #3498db, #2ecc71);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #bdc3c7;
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #e74c3c;
+}
+
+.minigame-content {
+  padding: 20px;
+  position: relative;
+  height: 420px;
+  /* Fixed height for interaction area */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.blue-print-bg {
+  /* Tech Grid Background */
+  background-color: rgb(30, 41, 59);
+  background-image:
+    linear-gradient(rgba(52, 152, 219, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(52, 152, 219, 0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.minigame-svg {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  /* Prevent scroll on mobile while playing */
+  filter: drop-shadow(0 0 5px rgba(52, 152, 219, 0.5));
+}
+
+.success-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(39, 174, 96, 0.2);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: #2ecc71;
+  font-family: 'Orbitron', sans-serif;
+  animation: fadeIn 0.3s ease-out;
+  pointer-events: none;
+  border-radius: 12px;
+  text-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+}
+
+.success-overlay h2 {
+  font-size: 2rem;
+  margin-top: 10px;
+}
+
+.minigame-instruction {
+  margin-top: 10px;
+  color: #ecf0f1;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  opacity: 0.8;
+  text-align: center;
+}
+
+.scale-up-center {
+  animation: scale-up-center 0.4s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+}
+
+@keyframes scale-up-center {
+  0% {
+    transform: scale(0.8) translateY(20px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-green {
+  0% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
+  }
+
+  50% {
+    transform: translateX(-50%) scale(1.05);
+    box-shadow: 0 12px 24px rgba(46, 204, 113, 0.6);
+  }
+
+  100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
+  }
+}
+
+.final-phase-btn:hover {
+  filter: brightness(1.1);
+  transform: translateX(-50%) scale(1.1) !important;
+}

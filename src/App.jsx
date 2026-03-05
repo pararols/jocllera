@@ -325,7 +325,7 @@ function App() {
   return (
     <div className="App">
       {/* ADMIN & DEV TOOLS */}
-      <div style={{ position: 'fixed', bottom: 20, left: 20, zIndex: 5000, display: 'flex', gap: '10px' }}>
+      <div className="admin-tools" style={{ position: 'fixed', bottom: 20, left: 20, zIndex: 5000, display: 'flex', gap: '10px' }}>
         <button
           onClick={handleAdminAuth}
           style={{

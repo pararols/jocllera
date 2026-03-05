@@ -520,3 +520,228 @@ body {
   filter: brightness(1.1);
   transform: translateX(-50%) scale(1.1) !important;
 }
+
+/* =========================================
+   WELCOME SCREEN
+   ========================================= */
+.welcome-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 30000;
+  background-image: url(/cinematics/celdoni_intro.png);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.welcome-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.4) 100%);
+  z-index: 0;
+}
+
+.welcome-container {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  width: 100%;
+  padding: 40px;
+  background: rgba(20, 20, 25, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  box-sizing: border-box;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.welcome-title {
+  font-size: 3rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin: 0 0 10px 0;
+  color: #f1c40f;
+  text-shadow: 0 2px 10px rgba(241, 196, 15, 0.3);
+}
+
+.welcome-subtitle {
+  font-size: 1.5rem;
+  font-weight: 300;
+  margin: 0 0 30px 0;
+  color: #ecf0f1;
+  letter-spacing: 1px;
+}
+
+.welcome-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  color: #bdc3c7;
+  text-align: left;
+}
+
+.welcome-mission {
+  text-align: left;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 40px;
+}
+
+.welcome-mission h3 {
+  margin: 0 0 15px 0;
+  color: #f1c40f;
+  font-size: 1.2rem;
+}
+
+.welcome-mission ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.welcome-mission li {
+  display: flex;
+  align-items: flex-start;
+}
+
+.welcome-mission li span {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+.welcome-ready {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 25px;
+  color: #ecf0f1;
+}
+
+.welcome-btn {
+  background: linear-gradient(90deg, #f1c40f 0%, #f39c12 100%);
+  color: #000;
+  border: none;
+  padding: 16px 40px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.welcome-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(241, 196, 15, 0.6);
+}
+
+
+/* =========================================
+   RESPONSIVE DESIGN (MOBILE)
+   ========================================= */
+@media (max-width: 768px) {
+
+  /* Welcome Screen Mobile */
+  .welcome-container {
+    padding: 20px;
+  }
+
+  .welcome-title {
+    font-size: 1.8rem;
+    letter-spacing: 2px;
+  }
+
+  .welcome-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+  }
+
+  .welcome-text {
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+  }
+
+  .welcome-mission {
+    padding: 15px;
+    margin-bottom: 25px;
+  }
+
+  .welcome-mission h3 {
+    font-size: 1rem;
+  }
+
+  .welcome-mission li {
+    font-size: 0.95rem;
+  }
+
+  .welcome-ready {
+    font-size: 1rem;
+    margin-bottom: 20px;
+  }
+
+  .welcome-btn {
+    padding: 14px 20px;
+    font-size: 1rem;
+    width: 100%;
+  }
+
+  /* Game UI Mobile */
+  .resource-hud {
+    top: auto !important;
+    bottom: 20px !important;
+    left: 10px !important;
+    width: calc(100vw - 20px) !important;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .resource-hud h3 {
+    width: 100%;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+  }
+
+  .resource-item {
+    flex: 1;
+    min-width: 120px;
+    margin-bottom: 5px;
+    margin-right: 10px;
+  }
+
+  header h1 {
+    font-size: 1rem !important;
+  }
+
+  .minigame-card {
+    height: 90vh;
+    overflow-y: auto;
+  }
+}

@@ -313,11 +313,11 @@ const AquiferDefense = ({ onComplete, onClose, onImpact, onPenalty }) => {
                         </div>
                     )}
 
-                    <div style={{ position: 'absolute', top: 20, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '40px', pointerEvents: 'none' }}>
-                        <div style={{ color: '#2ecc71', backgroundColor: 'rgba(0,0,0,0.85)', padding: '8px 25px', borderRadius: '30px', border: '2px solid #2ecc71', fontWeight: 'bold', fontSize: '1.1rem', boxShadow: '0 0 15px rgba(46, 204, 113, 0.3)' }}>
+                    <div className="aquifer-scores" style={{ position: 'absolute', top: 20, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '40px', pointerEvents: 'none' }}>
+                        <div className="aquifer-score-box" style={{ color: '#2ecc71', backgroundColor: 'rgba(0,0,0,0.85)', padding: '8px 25px', borderRadius: '30px', border: '2px solid #2ecc71', fontWeight: 'bold', fontSize: '1.1rem', boxShadow: '0 0 15px rgba(46, 204, 113, 0.3)' }}>
                             RIU I GRANGES: {savedPercent}%
                         </div>
-                        <div style={{ color: '#e74c3c', backgroundColor: 'rgba(0,0,0,0.85)', padding: '8px 25px', borderRadius: '30px', border: '2px solid #e74c3c', fontWeight: 'bold', fontSize: '1.1rem', boxShadow: '0 0 15px rgba(231, 76, 60, 0.3)' }}>
+                        <div className="aquifer-score-box" style={{ color: '#e74c3c', backgroundColor: 'rgba(0,0,0,0.85)', padding: '8px 25px', borderRadius: '30px', border: '2px solid #e74c3c', fontWeight: 'bold', fontSize: '1.1rem', boxShadow: '0 0 15px rgba(231, 76, 60, 0.3)' }}>
                             CAMP DE GOLF: {lostPercent}%
                         </div>
                     </div>

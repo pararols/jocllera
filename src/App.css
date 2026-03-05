@@ -662,8 +662,14 @@ body {
 
 
 /* =========================================
-   SPECULATION HUD
+   SPECULATION HUD & HEADER TITLE
    ========================================= */
+.game-header h1 {
+  font-size: 1.2rem;
+  margin: 0;
+  color: var(--color-earth-dark);
+}
+
 .speculation-hud {
   position: absolute;
   top: 80px;
@@ -724,6 +730,44 @@ body {
     padding: 14px 20px;
     font-size: 1rem;
     width: 100%;
+  }
+
+  /* Minigame Mobile Overrides */
+  .tycoon-content {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+  }
+
+  .tycoon-experts {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 2px solid #bdc3c7 !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    justify-content: space-around !important;
+  }
+
+  .tycoon-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .tycoon-hud {
+    flex-direction: column !important;
+    height: auto !important;
+    padding: 10px !important;
+    gap: 10px !important;
+  }
+
+  .aquifer-scores {
+    flex-direction: column !important;
+    gap: 5px !important;
+    top: 5px !important;
+    width: 100% !important;
+  }
+
+  .aquifer-score-box {
+    padding: 4px 10px !important;
+    font-size: 0.8rem !important;
   }
 
   /* Game UI Mobile - Interactive HUD */

@@ -162,7 +162,7 @@ const PavelloTycoon = ({ onComplete, onClose, maxPower, rewardFactor }) => {
             }}>
 
                 {/* HUD */}
-                <div style={{ background: '#2f3640', color: 'white', padding: '10px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '70px' }}>
+                <div className="tycoon-hud" style={{ background: '#2f3640', color: 'white', padding: '10px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '70px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                         <Building2 color="#f1c40f" size={32} />
                         <div>
@@ -187,10 +187,10 @@ const PavelloTycoon = ({ onComplete, onClose, maxPower, rewardFactor }) => {
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+                <div className="tycoon-content" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
                     {/* Left: Experts */}
-                    <div style={{ width: '280px', background: '#dcdde1', padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px', borderRight: '2px solid #bdc3c7' }}>
+                    <div className="tycoon-experts" style={{ width: '280px', background: '#dcdde1', padding: '15px', display: 'flex', flexDirection: 'column', gap: '15px', borderRight: '2px solid #bdc3c7' }}>
                         <h3 style={{ margin: 0, borderBottom: '2px solid #2f3640', paddingBottom: '5px', fontSize: '1rem' }}>Estratègia i Experts</h3>
                         {Object.entries(experts).map(([key, expert]) => (
                             <div
@@ -288,7 +288,7 @@ const PavelloTycoon = ({ onComplete, onClose, maxPower, rewardFactor }) => {
                             </div>
                         )}
 
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
+                        <div className="tycoon-actions" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '15px' }}>
                             {actions.map(action => {
                                 const cost = calculateCost(action);
                                 const canAfford = budget >= cost;

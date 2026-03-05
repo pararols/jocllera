@@ -5,15 +5,12 @@ const CinematicOverlay = ({ phase, onComplete }) => {
     const [step, setStep] = useState(0);
     const [isPlayingVideo, setIsPlayingVideo] = useState(true);
 
-    // Auto-skip "video" after 5 seconds to match the image animation
+    // Auto-skip if no video is present for some reason
     useEffect(() => {
-        if (isPlayingVideo) {
-            const timer = setTimeout(() => {
-                setIsPlayingVideo(false);
-            }, 5000);
-            return () => clearTimeout(timer);
+        if (isPlayingVideo && !phase.video) {
+            setIsPlayingVideo(false);
         }
-    }, [isPlayingVideo]);
+    }, [isPlayingVideo, phase.video]);
 
     const handleNext = () => {
         if (step < phase.dialogue.length - 1) {
@@ -23,7 +20,7 @@ const CinematicOverlay = ({ phase, onComplete }) => {
         }
     };
 
-    if (isPlayingVideo) {
+    if (isPlayingVideo && phase.video) {
         return (
             <div style={{
                 position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
@@ -31,15 +28,10 @@ const CinematicOverlay = ({ phase, onComplete }) => {
             }}>
                 <style>
                     {`
-                    @keyframes cinematicKenBurns {
-                        0% { transform: scale(1); }
-                        100% { transform: scale(1.1); }
-                    }
-                    .cinematic-image {
+                    .cinematic-video {
                         width: 100%;
                         height: 100%;
                         object-fit: cover;
-                        animation: cinematicKenBurns 5s ease-out forwards;
                     }
                     .skip-btn {
                         position: absolute;
@@ -60,7 +52,13 @@ const CinematicOverlay = ({ phase, onComplete }) => {
                     }
                     `}
                 </style>
-                <img src={phase.image} alt="Cinematic" className="cinematic-image" />
+                <video
+                    src={phase.video}
+                    className="cinematic-video"
+                    autoPlay
+                    playsInline
+                    onEnded={() => setIsPlayingVideo(false)}
+                />
                 <button
                     onClick={() => setIsPlayingVideo(false)}
                     className="skip-btn"

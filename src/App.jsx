@@ -1,6 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Network, Battery, Activity, Zap, ShieldAlert, Radio, AlertTriangle } from 'lucide-react';
 import './App.css';
 import GameMap from './components/GameMap';
+import ZoneEditor from './components/ZoneEditor';
+import CinematicOverlay from './components/CinematicOverlay';
+import MusicPlayer from './components/MusicPlayer';
+import WelcomeScreen from './components/WelcomeScreen';
+
+// Minigames
 import ConnectTheDots from './components/minigames/ConnectTheDots';
 import SliderBalance from './components/minigames/SliderBalance';
 import HeatPumpHarmony from './components/minigames/HeatPumpHarmony';
@@ -11,9 +18,6 @@ import AturemPlater from './components/minigames/AturemPlater';
 import RhythmGame from './components/minigames/RhythmGame';
 import CommunityEnergy from './components/minigames/CommunityEnergy';
 import PavelloTycoon from './components/minigames/PavelloTycoon';
-import CinematicOverlay from './components/CinematicOverlay';
-import MusicPlayer from './components/MusicPlayer';
-import ZoneEditor from './components/ZoneEditor';
 import gisData from './data/gis_data.json';
 import { NARRATIVE_PHASES } from './data/narrative_content';
 import { EnemySystem } from './logic/EnemySystem';
@@ -574,31 +578,11 @@ function App() {
         />
       )}
 
+      {/* MODALS & OVERLAYS */}
+
       {/* START MODAL */}
-      {showStartModal && !showCinematic && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <img
-              src="/assets/inici.png"
-              alt="Benvinguda"
-              style={{ width: '100%', maxHeight: '400px', objectFit: 'cover', borderRadius: '12px', marginBottom: '20px', border: '2px solid #34495e' }}
-            />
-            <h2>Sant Jordi sota l'Ombra</h2>
-            <p>
-              L'especulació ha tenyit de gris la nostra terra (100% Corrupció).
-              Els "Suits" veuen casa nostra només com a dades i beneficis.
-            </p>
-            <p>
-              <strong>La teva missió:</strong> Connecta els <strong>{totalRooftopNodes} Punts de Sobirania</strong> (teulades veïnals)
-              per trencar la malla especulativa i recuperar el color.
-            </p>
-            <p>
-              <em>Nota: Mai podrem eliminar del tot l'amenaça (sempre quedarà un 20%),
-                però junts podem fer que la vida torni a brotar.</em>
-            </p>
-            <button onClick={() => setShowStartModal(false)}>COMENÇAR LA RESISTÈNCIA</button>
-          </div>
-        </div>
+      {showStartModal && (
+        <WelcomeScreen onStart={() => setShowStartModal(false)} />
       )}
 
       {/* VICTORY MODAL */}

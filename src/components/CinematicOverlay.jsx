@@ -31,7 +31,7 @@ const CinematicOverlay = ({ phase, onComplete }) => {
                     .cinematic-video {
                         width: 100%;
                         height: 100%;
-                        object-fit: cover;
+                        object-fit: contain;
                     }
                     .skip-btn {
                         position: absolute;

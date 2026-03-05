@@ -662,6 +662,22 @@ body {
 
 
 /* =========================================
+   SPECULATION HUD
+   ========================================= */
+.speculation-hud {
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  z-index: 1000;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 250px;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+}
+
+/* =========================================
    RESPONSIVE DESIGN (MOBILE)
    ========================================= */
 @media (max-width: 768px) {
@@ -802,6 +818,26 @@ body {
     gap: 8px !important;
     bottom: 20px !important;
     left: 10px !important;
+  }
+
+  /* Speculation HUD Mobile (Collapsible) */
+  .speculation-hud.collapsed {
+    transform: translateX(150%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .speculation-hud.expanded {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .speculation-hud {
+    position: fixed !important;
+    top: 70px !important;
+    right: 15px !important;
+    max-width: calc(100vw - 30px) !important;
   }
 }
 

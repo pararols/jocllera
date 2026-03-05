@@ -351,9 +351,10 @@ const HeatHazeSabotage = ({ onComplete, onClose, onImpact }) => {
 
                     {/* Instructions */}
                     <div style={{
-                        position: 'absolute', bottom: 8, left: 12,
-                        color: 'rgba(255,255,255,0.65)', fontSize: '0.8rem',
-                        background: 'rgba(0,0,0,0.5)', padding: '4px 10px', borderRadius: 6
+                        position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
+                        color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', textAlign: 'center', width: '90%',
+                        background: 'rgba(0,0,0,0.6)', padding: '6px 10px', borderRadius: 6,
+                        pointerEvents: 'none', zIndex: 10
                     }}>
                         Arrossega les jaquetes 🧥 fins a cada persona per escalfar-les i apagar les estufes
                     </div>

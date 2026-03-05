@@ -38,6 +38,13 @@ function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [mapType, setMapType] = useState('ortho'); // 'light' or 'ortho'
 
+  // Energy Community Mechanics
+  const [communityPower, setCommunityPower] = useState(0);
+  const [energyPoints, setEnergyPoints] = useState(50);
+
+  // Mobile HUD Toggle
+  const [isMobileHudExpanded, setIsMobileHudExpanded] = useState(false);
+
   // Narrative State
   const [gamePhase, setGamePhase] = useState(0);
   const [showCinematic, setShowCinematic] = useState(false);
@@ -377,32 +384,20 @@ function App() {
       {/* ... (Header and HUD remain the same) ... */}
 
       {/* HUD Header */}
-      <header style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        width: '100%',
-        padding: '1rem',
-        zIndex: 1000,
-        pointerEvents: 'none'
-      }}>
-        <div style={{
-          background: 'rgba(255,255,255,0.9)',
-          backdropFilter: 'blur(5px)',
-          padding: '10px 20px',
-          borderRadius: '12px',
-          display: 'inline-block',
-          pointerEvents: 'auto',
-          boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
-        }}>
-          <h1 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--color-earth-dark)' }}>
-            L'Últim Cavaller de la Llera
-          </h1>
+      <header className={`game-header ${isMobileHudExpanded ? 'expanded' : 'collapsed'}`}>
+        <div className="header-content">
+          <h1 className="header-title">L'Últim Cavaller de la Llera</h1>
+          <button
+            className="mobile-hud-toggle"
+            onClick={() => setIsMobileHudExpanded(!isMobileHudExpanded)}
+          >
+            {isMobileHudExpanded ? 'Tancar Info ▲' : 'Veure Recursos ▼'}
+          </button>
         </div>
       </header>
 
       {/* RESOURCE HUD (LEFT) */}
-      <div className="resource-hud">
+      <div className={`resource-hud ${isMobileHudExpanded ? 'expanded' : 'collapsed'}`}>
         <h3 style={{ color: '#e74c3c' }}>📡 Amenaça Especulativa: {Math.round(corruptionLevel)}%</h3>
         <h3>Impacte Comunitari (Anual)</h3>
         {/* ... (Resource content) ... */}

@@ -151,9 +151,26 @@ const MobileApp = (props) => {
             </nav>
 
             {/* MODALS & OVERLAYS */}
-            {showStartModal && <WelcomeScreen onStart={() => setShowStartModal(false)} />}
+            {showStartModal && (
+                <WelcomeScreen
+                    onStart={() => {
+                        setShowStartModal(false);
+                        setShowCinematic(true);
+                    }}
+                />
+            )}
             <MusicPlayer phase={gamePhase} />
-            {showCinematic && <CinematicOverlay phase={NARRATIVE_PHASES[gamePhase]} onComplete={() => setShowCinematic(false)} />}
+            {showCinematic && (
+                <CinematicOverlay
+                    phase={NARRATIVE_PHASES[gamePhase]}
+                    onComplete={() => {
+                        setShowCinematic(false);
+                        if (gamePhase === 0 && setGamePhase) {
+                            setGamePhase(1);
+                        }
+                    }}
+                />
+            )}
 
             {showVictoryModal && (
                 <div className="modal-overlay" style={{ padding: '20px' }}>

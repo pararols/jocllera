@@ -358,6 +358,7 @@ function App() {
         pendingNode={pendingNode}
         setPendingNode={setPendingNode}
         corruptionLevel={corruptionLevel}
+        setGamePhase={setGamePhase}
         handleLiberateNode={handleLiberateNode}
         handleEnemyClick={handleEnemyClick}
         handleBadNodeClick={handleBadNodeClick}

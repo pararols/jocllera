@@ -404,78 +404,8 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                 </div>
             )}
 
-            {/* HUD Overlay for Corruption Level */}
-            <div className={`speculation-hud ${isMobileHudExpanded ? 'expanded' : 'collapsed'}`}>
-                <h3 style={{ margin: '0 0 10px 0', fontSize: '1rem', color: '#333' }}>NIvell d'Especulació</h3>
-                <div style={{ width: '100%', height: '12px', background: '#ecf0f1', borderRadius: '6px', overflow: 'hidden', marginBottom: '10px' }}>
-                    <div style={{ width: `${corruptionLevel}%`, height: '100%', background: corruptionLevel > 80 ? '#e74c3c' : corruptionLevel > 50 ? '#f39c12' : '#2ecc71', transition: 'width 0.3s' }}></div>
-                </div>
-                <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', textAlign: 'right', fontSize: '0.9rem' }}>{Math.round(corruptionLevel)}%</p>
-
-                {/* Speculators & Coins Legend */}
-                <div style={{ borderTop: '1px solid #bdc3c7', paddingTop: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#2c3e50', marginRight: '5px' }}>Amenaça ({enemies ? enemies.length : 0}):</span>
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '10px' }}>
-                        {enemies && enemies.map((enemy, i) => (
-                            <div key={`suit-${enemy.id}`} title="Executiu Especulador" style={{ animation: 'fadeIn 0.5s' }}>
-                                {/* Custom Suit Man Icon */}
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2c3e50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="7" r="4" />
-                                    <path d="M5.5 21v-2a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v2" />
-                                    <path d="M12 11l-1 4.5l1 1.5l1-1.5l-1-4.5" fill="#e74c3c" stroke="none" /> {/* Red Tie for Danger */}
-                                    <path d="M12 11l-1 4.5l1 1.5l1-1.5l-1-4.5" stroke="#2c3e50" strokeWidth="1" fill="none" />
-                                </svg>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#f1c40f', textShadow: '0 1px 1px rgba(0,0,0,0.1)', marginRight: '5px' }}>Botí:</span>
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px', marginBottom: '10px' }}>
-                        {Array.from({ length: (gisData.installations.filter(i => i.type === 'rooftop').length - liberatedNodes.size) + 3 }).map((_, i) => (
-                            <div key={`coin-${i}`} title="Euro" style={{
-                                width: '16px', height: '16px',
-                                borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #f1c40f 0%, #f39c12 100%)',
-                                border: '1px solid #d35400',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '10px', fontWeight: 'bold', color: '#945c08',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                                animation: 'fadeIn 0.5s'
-                            }}>
-                                €
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Plater Legend */}
-                    <div style={{ borderTop: '1px solid #bdc3c7', paddingTop: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                            <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#2c3e50', marginRight: '5px' }}>Llegenda Plater:</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '12px', height: '12px', background: '#e67e22', borderRadius: '2px', border: '1px solid #d35400' }}></div>
-                                <span style={{ fontSize: '0.75rem', color: '#2c3e50' }}>Zona Prioritària</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '12px', height: '12px', background: '#3498db', borderRadius: '2px', border: '1px solid #2980b9' }}></div>
-                                <span style={{ fontSize: '0.75rem', color: '#2c3e50' }}>Zona Apta</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '12px', height: '12px', background: '#f1c40f', borderRadius: '50%', border: '2px solid #f39c12' }}></div>
-                                <span style={{ fontSize: '0.75rem', color: '#2c3e50' }}>Comunitat Energètica</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     );
 };
 
-export default GameMap;
+export default MobileGameMap;

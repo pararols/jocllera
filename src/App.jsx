@@ -6,6 +6,7 @@ import ZoneEditor from './components/ZoneEditor';
 import CinematicOverlay from './components/CinematicOverlay';
 import MusicPlayer from './components/MusicPlayer';
 import WelcomeScreen from './components/WelcomeScreen';
+import MobileApp from './mobile/MobileApp';
 
 // Minigames
 import ConnectTheDots from './components/minigames/ConnectTheDots';
@@ -329,6 +330,45 @@ function App() {
     setPendingNode(null);
   };
 
+  const [isMobileDevice, setIsMobileDevice] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobileDevice(window.innerWidth <= 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  if (isMobileDevice) {
+    return (
+      <MobileApp
+        liberatedNodes={liberatedNodes}
+        clearedBads={clearedBads}
+        enemies={enemies}
+        showStartModal={showStartModal}
+        setShowStartModal={setShowStartModal}
+        showVictoryModal={showVictoryModal}
+        setShowVictoryModal={setShowVictoryModal}
+        lastDamageEvent={lastDamageEvent}
+        co2Bonus={co2Bonus}
+        gamePhase={gamePhase}
+        showCinematic={showCinematic}
+        setShowCinematic={setShowCinematic}
+        activeMiniGame={activeMiniGame}
+        setActiveMiniGame={setActiveMiniGame}
+        pendingNode={pendingNode}
+        setPendingNode={setPendingNode}
+        corruptionLevel={corruptionLevel}
+        handleLiberateNode={handleLiberateNode}
+        handleEnemyClick={handleEnemyClick}
+        handleBadNodeClick={handleBadNodeClick}
+        handleImpact={handleImpact}
+        handlePenalty={handlePenalty}
+        completeBadNode={completeBadNode}
+        calculateStats={calculateStats}
+      />
+    );
+  }
+
   return (
     <div className="App">
       {/* ADMIN & DEV TOOLS */}
@@ -440,6 +480,7 @@ function App() {
           lastDamageEvent={lastDamageEvent}
           isEditorMode={showEditor}
           mapType={mapType}
+          isMobileHudExpanded={isMobileHudExpanded}
         >
           {showEditor && <ZoneEditor onClose={() => setShowEditor(false)} />}
         </GameMap>

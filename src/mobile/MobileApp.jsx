@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Target, Activity, Settings, Map as MapIcon, ShieldAlert } from 'lucide-react';
+import { Target, Activity, Settings, Map as MapIcon, ShieldAlert, MapPin, BarChart2 } from 'lucide-react';
 import MobileGameMap from './MobileGameMap';
 
 // Minigames
@@ -32,6 +32,7 @@ const MobileApp = (props) => {
         lastDamageEvent,
         co2Bonus,
         gamePhase,
+        setGamePhase,
         showCinematic,
         setShowCinematic,
         activeMiniGame,

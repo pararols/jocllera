@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, ImageOverlay, P
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import gisData from '../data/gis_data.json';
-import { Leaf, DollarSign, Wind, Flame, Droplets, Zap, ShieldAlert, Cpu, Coins, Ban, X, TreeDeciduous } from 'lucide-react';
+import { Leaf, DollarSign, Wind, Flame, Droplets, Zap, ShieldAlert, Cpu, Coins, Ban, X, TreeDeciduous, Map as MapIcon, Layers } from 'lucide-react';
 
 // Fix for default marker icon in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -60,7 +60,7 @@ const MapEventListener = ({ lastDamageEvent, addDamageText }) => {
     return null;
 };
 
-const MobileGameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onEnemyClick, clearedBads, onBadNodeClick, lastDamageEvent, children, isEditorMode, mapType = 'ortho', isMobileHudExpanded }) => {
+const MobileGameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onEnemyClick, clearedBads, onBadNodeClick, lastDamageEvent, children, isEditorMode, mapType = 'ortho', setMapType, totalRooftopNodes, isMobileHudExpanded }) => {
     const position = gisData.center; // Sant Jordi Desvalls center
     const [feedbackItems, setFeedbackItems] = React.useState([]);
     const [activeInfo, setActiveInfo] = React.useState(null);
@@ -217,7 +217,33 @@ const MobileGameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemie
 
     return (
         <div className="map-wrapper" style={wrapperStyle}>
-            {/* Minigame Overlay Removed from here */}
+            {/* Top Right HUD - Mobile Map Toggle */}
+            <div style={{ position: 'absolute', top: 10, right: 10, zIndex: 1000, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <button
+                    onClick={(e) => { e.stopPropagation(); setMapType(m => m === 'ortho' ? 'light' : 'ortho'); }}
+                    style={{
+                        padding: '10px', background: 'rgba(255,255,255,0.95)', border: 'none', borderRadius: '8px',
+                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                    }}
+                >
+                    {mapType === 'ortho' ? <MapIcon size={24} color="#2c3e50" /> : <Layers size={24} color="#2c3e50" />}
+                </button>
+            </div>
+
+            {/* Top Left HUD - Mobile Progress */}
+            {totalRooftopNodes > 0 && (
+                <div style={{ position: 'absolute', top: 10, left: 10, zIndex: 1000, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ background: 'rgba(255,255,255,0.95)', padding: '8px 12px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <TreeDeciduous size={18} color="#2ecc71" />
+                        <span style={{ fontSize: '0.95rem', fontWeight: 'bold' }}>{liberatedNodes?.size || 0} / {totalRooftopNodes}</span>
+                    </div>
+                    <div style={{ background: 'rgba(255,255,255,0.95)', padding: '8px 12px', borderRadius: '8px', boxShadow: '0 2px 5px rgba(0,0,0,0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <Ban size={18} color="#e74c3c" />
+                        <span style={{ fontSize: '0.95rem', fontWeight: 'bold' }}>Especulació: {Math.round(corruptionLevel)}%</span>
+                    </div>
+                </div>
+            )}
+
 
             <MapContainer
                 center={position}

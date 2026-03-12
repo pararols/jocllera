@@ -366,6 +366,9 @@ function App() {
         handlePenalty={handlePenalty}
         completeBadNode={completeBadNode}
         calculateStats={calculateStats}
+        completeLiberation={completeLiberation}
+        mapType={mapType}
+        setMapType={setMapType}
       />
     );
   }

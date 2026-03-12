@@ -6,7 +6,7 @@ import marketingIcon from '../../assets/expert_marketing.png';
 import gameDesignIcon from '../../assets/expert_game_design.png';
 import narrativeIcon from '../../assets/expert_narrative.png';
 
-const PavelloTycoon = ({ onComplete, onClose, maxPower, rewardFactor }) => {
+const MobilePavelloTycoon = ({ onComplete, onClose, maxPower, rewardFactor }) => {
     const [budget, setBudget] = useState(500);
     const [participants, setParticipants] = useState(1);
     const [turn, setTurn] = useState(1);

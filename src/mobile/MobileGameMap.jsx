@@ -60,7 +60,7 @@ const MapEventListener = ({ lastDamageEvent, addDamageText }) => {
     return null;
 };
 
-const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onEnemyClick, clearedBads, onBadNodeClick, lastDamageEvent, children, isEditorMode, mapType = 'ortho', isMobileHudExpanded }) => {
+const MobileGameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onEnemyClick, clearedBads, onBadNodeClick, lastDamageEvent, children, isEditorMode, mapType = 'ortho', isMobileHudExpanded }) => {
     const position = gisData.center; // Sant Jordi Desvalls center
     const [feedbackItems, setFeedbackItems] = React.useState([]);
     const [activeInfo, setActiveInfo] = React.useState(null);

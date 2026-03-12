@@ -260,7 +260,7 @@ const HeatPumpHarmony = ({ onComplete, onClose, onImpact }) => {
                     )}
 
                     {/* Controls Display */}
-                    <div style={{ position: 'absolute', bottom: 20, left: 0, width: '100%', display: 'flex', justifyContent: 'center', gap: '140px' }}>
+                    <div style={{ position: 'absolute', bottom: '10%', left: 0, width: '100%', display: 'flex', justifyContent: 'center', gap: 'max(10%, 20px)' }}>
                         {lanes.map(lane => (
                             <div key={lane.id} onClick={() => handleHit(lane.id)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                                 <div style={{ width: 60, height: 60, borderRadius: '50%', border: '2px solid #f1c40f', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(241, 196, 15, 0.1)', color: '#f1c40f', transition: 'all 0.1s' }}>

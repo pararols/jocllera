@@ -75,6 +75,7 @@ const MobileApp = (props) => {
                         onLiberateNode={handleLiberateNode}
                         enemies={enemies}
                         onEnemyClick={handleEnemyClick}
+                        clearedBads={clearedBads}
                         onBadNodeClick={handleBadNodeClick}
                         lastDamageEvent={lastDamageEvent}
                         mapType={mapType}
@@ -196,7 +197,7 @@ const MobileApp = (props) => {
                     {activeMiniGame === 'slider' && <SliderBalance onComplete={() => completeLiberation(pendingNode.id)} onClose={() => setActiveMiniGame(null)} />}
                     {activeMiniGame === 'heatPump' && <HeatPumpHarmony onComplete={() => completeLiberation(pendingNode.id)} onClose={() => setActiveMiniGame(null)} />}
                     {activeMiniGame === 'rhythm' && <RhythmGame onComplete={() => completeLiberation(pendingNode.id)} onClose={() => setActiveMiniGame(null)} />}
-                    {activeMiniGame === 'community' && <CommunityEnergy onComplete={(reward) => completeLiberation(pendingNode.id, reward)} onClose={() => setActiveMiniGame(null)} />}
+                    {activeMiniGame === 'community' && <CommunityEnergy onComplete={(reward) => completeLiberation(pendingNode.id, reward)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode.power} rewardFactor={20} />}
                     {activeMiniGame === 'tycoon' && <MobilePavelloTycoon onComplete={(reward) => completeLiberation(pendingNode.id, reward)} onClose={() => setActiveMiniGame(null)} />}
                     {activeMiniGame === 'heatHaze' && <HeatHazeSabotage onComplete={() => completeBadNode(pendingNode.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
                     {activeMiniGame === 'aquifer' && <MobileAquiferDefense onComplete={() => completeBadNode(pendingNode.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}

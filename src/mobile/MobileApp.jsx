@@ -4,12 +4,12 @@ import MobileGameMap from './MobileGameMap';
 
 // Minigames
 import ConnectTheDots from '../components/minigames/ConnectTheDots';
-import SliderBalance from '../components/minigames/SliderBalance';
-import HeatPumpHarmony from '../components/minigames/HeatPumpHarmony';
-import HeatHazeSabotage from '../components/minigames/HeatHazeSabotage';
+import MobileSliderBalance from './minigames/MobileSliderBalance';
+import MobileHeatPumpHarmony from './minigames/MobileHeatPumpHarmony';
+import MobileHeatHazeSabotage from './minigames/MobileHeatHazeSabotage';
 import MobileAquiferDefense from './minigames/MobileAquiferDefense';
-import EvaporationRace from '../components/minigames/EvaporationRace';
-import AturemPlater from '../components/minigames/AturemPlater';
+import MobileEvaporationRace from './minigames/MobileEvaporationRace';
+import MobileAturemPlater from './minigames/MobileAturemPlater';
 import RhythmGame from '../components/minigames/RhythmGame';
 import CommunityEnergy from '../components/minigames/CommunityEnergy';
 import MobilePavelloTycoon from './minigames/MobilePavelloTycoon';
@@ -194,15 +194,15 @@ const MobileApp = (props) => {
             {activeMiniGame && (
                 <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 1000, backgroundColor: '#000' }}>
                     {activeMiniGame === 'connect' && <ConnectTheDots onComplete={() => completeLiberation(pendingNode.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
-                    {activeMiniGame === 'slider' && <SliderBalance onComplete={() => completeLiberation(pendingNode.id)} onClose={() => setActiveMiniGame(null)} />}
-                    {activeMiniGame === 'heatPump' && <HeatPumpHarmony onComplete={() => completeLiberation(pendingNode.id)} onClose={() => setActiveMiniGame(null)} />}
+                    {activeMiniGame === 'slider' && <MobileSliderBalance onComplete={() => completeLiberation(pendingNode.id)} onClose={() => setActiveMiniGame(null)} />}
+                    {activeMiniGame === 'heatPump' && <MobileHeatPumpHarmony onComplete={() => completeLiberation(pendingNode.id)} onClose={() => setActiveMiniGame(null)} />}
                     {activeMiniGame === 'rhythm' && <RhythmGame onComplete={() => completeLiberation(pendingNode.id)} onClose={() => setActiveMiniGame(null)} />}
                     {activeMiniGame === 'community' && <CommunityEnergy onComplete={(reward) => completeLiberation(pendingNode.id, reward)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode.power} rewardFactor={20} />}
                     {activeMiniGame === 'tycoon' && <MobilePavelloTycoon onComplete={(reward) => completeLiberation(pendingNode.id, reward)} onClose={() => setActiveMiniGame(null)} />}
-                    {activeMiniGame === 'heatHaze' && <HeatHazeSabotage onComplete={() => completeBadNode(pendingNode.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
+                    {activeMiniGame === 'heatHaze' && <MobileHeatHazeSabotage onComplete={() => completeBadNode(pendingNode.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
                     {activeMiniGame === 'aquifer' && <MobileAquiferDefense onComplete={() => completeBadNode(pendingNode.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-                    {activeMiniGame === 'evaporation' && <EvaporationRace onComplete={() => completeBadNode(pendingNode.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-                    {activeMiniGame === 'aturemPlater' && <AturemPlater onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
+                    {activeMiniGame === 'evaporation' && <MobileEvaporationRace onComplete={() => completeBadNode(pendingNode.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
+                    {activeMiniGame === 'aturemPlater' && <MobileAturemPlater onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
                 </div>
             )}
         </div>

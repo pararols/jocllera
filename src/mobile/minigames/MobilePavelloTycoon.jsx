@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Building2, Users, Coins, MessageSquare, Megaphone, Newspaper, Mail, Users2, CheckCircle, XCircle, Info, Sparkles, TrendingUp } from 'lucide-react';
 
-import marketingIcon from '../../assets/expert_marketing.png';
-import gameDesignIcon from '../../assets/expert_game_design.png';
-import narrativeIcon from '../../assets/expert_narrative.png';
+const marketingIcon = '/assets/expert_marketing.png';
+const gameDesignIcon = '/assets/expert_game_design.png';
+const narrativeIcon = '/assets/expert_narrative.png';
 
 const MobilePavelloTycoon = ({ onComplete, onClose, maxPower, rewardFactor }) => {
     const [budget, setBudget] = useState(500);

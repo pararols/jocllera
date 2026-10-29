@@ -1,9 +1,10 @@
 import React from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, ImageOverlay, Polygon } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, useMapEvents, ImageOverlay, Polygon, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import gisData from '../data/gis_data.json';
-import { Leaf, DollarSign, Wind, Flame, Droplets, Zap, ShieldAlert, Cpu, Coins, Ban, X, TreeDeciduous } from 'lucide-react';
+import { Leaf, DollarSign, Wind, Flame, Droplets, Zap, ShieldAlert, Cpu, Coins, Ban, X, TreeDeciduous, Lock, Play } from 'lucide-react';
+import SoundManager from '../logic/SoundManager';
 
 // Fix for default marker icon in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -13,44 +14,285 @@ L.Icon.Default.mergeOptions({
     shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 });
 
-// --- CUSTOM ICONS ---
-// Instantiated ONCE outside the component so they don't force Leaflet to recreate the DOM 
-// every 100ms when the marker moves, which breaks the click events.
-const suitIcon = new L.divIcon({
+// --- ICONS DEFINITION ---
+// Static & stable Suit Icons so Leaflet never destroys DOM nodes during click/drag
+const suitWalkingIcon = new L.divIcon({
     className: 'custom-enemy-icon',
     html: `
-        <div style="background: white; border-radius: 50%; padding: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); border: 2px solid #e74c3c; cursor: pointer; pointer-events: auto;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2c3e50" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="7" r="4" />
-                <path d="M5.5 21v-2a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v2" />
-                <path d="M12 11l-1 4.5l1 1.5l1-1.5l-1-4.5" fill="#e74c3c" stroke="none" />
-                <path d="M12 11l-1 4.5l1 1.5l1-1.5l-1-4.5" stroke="#2c3e50" stroke-width="1" fill="none" />
-            </svg>
+        <div title="Home de negre (Especulador) - Fes clic per expulsar-lo!" style="
+            background: #0f172a;
+            border-radius: 50%;
+            padding: 4px;
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.95);
+            border: 2.5px solid #ef4444;
+            cursor: pointer;
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            animation: pulse 1.2s infinite;
+        ">
+            <span style="font-size: 26px; line-height: 1;">🕴️</span>
         </div>
     `,
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-    popupAnchor: [0, -20]
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
+    popupAnchor: [0, -22]
 });
 
-const badIcon = new L.divIcon({
-    className: 'custom-bad-icon',
+const suitAttackingIcon = new L.divIcon({
+    className: 'custom-enemy-icon-attacking',
     html: `
-        <div style="background: white; border-radius: 50%; padding: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); border: 2px solid #d35400; cursor: pointer; pointer-events: auto;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d35400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
-            </svg>
+        <div title="🚨 SABOTATGE EN CURS! Fes clic per foragitar l'Home de Negre!" style="
+            background: #dc2626;
+            border-radius: 50%;
+            padding: 4px;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 1), 0 0 10px #ffffff;
+            border: 3px solid #ffffff;
+            cursor: pointer;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 52px;
+            height: 52px;
+            animation: sabotageShake 0.25s infinite alternate;
+            position: relative;
+        ">
+            <span style="font-size: 28px; line-height: 1;">🚨</span>
+            <div style="
+                position: absolute;
+                bottom: -16px;
+                background: #dc2626;
+                color: white;
+                font-size: 9px;
+                font-weight: 900;
+                padding: 1px 6px;
+                border-radius: 6px;
+                white-space: nowrap;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+                border: 1px solid white;
+                letter-spacing: 0.5px;
+            ">
+                ATACANT!
+            </div>
         </div>
     `,
-    iconSize: [36, 36],
-    iconAnchor: [18, 18],
-    popupAnchor: [0, -20]
+    iconSize: [52, 52],
+    iconAnchor: [26, 26],
+    popupAnchor: [0, -26]
 });
-// --------------------
 
-// We create an internal component to access the Leaflet map instance for coordinate projection
-const MapEventListener = ({ lastDamageEvent, addDamageText }) => {
+const getSuitIcon = (isAttacking) => isAttacking ? suitAttackingIcon : suitWalkingIcon;
+
+// Visual Marker for Liberated Rooftops (Solar & Sovereign) with explicit kW badge
+const liberatedRooftopIcon = (power, id) => new L.divIcon({
+    className: 'liberated-roof-icon',
+    html: `
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
+            <div style="
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                border: 2.5px solid #ffffff;
+                border-radius: 50%;
+                width: 32px;
+                height: 32px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 0 16px rgba(16, 185, 129, 0.95), 0 3px 8px rgba(0,0,0,0.4);
+                position: relative;
+            ">
+                <span style="font-size: 15px; line-height: 1;">⚡</span>
+            </div>
+            <div style="
+                background: #064e3b;
+                color: #a7f3d0;
+                font-size: 10px;
+                font-weight: 900;
+                padding: 1px 5px;
+                border-radius: 6px;
+                border: 1px solid #10b981;
+                white-space: nowrap;
+                margin-top: -5px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+                letter-spacing: -0.3px;
+            ">
+                ${(power !== undefined ? power : 0).toFixed(1)}k
+            </div>
+        </div>
+    `,
+    iconSize: [50, 50],
+    iconAnchor: [25, 25],
+    popupAnchor: [0, -25]
+});
+
+// Visual Marker for Pending Rooftops with explicit kW badge
+const pendingRooftopIcon = (power, id) => new L.divIcon({
+    className: 'pending-roof-icon',
+    html: `
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
+            <div style="
+                background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+                border: 2.5px solid #cbd5e1;
+                border-radius: 50%;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                box-shadow: 0 3px 8px rgba(0,0,0,0.5), 0 0 10px rgba(59, 130, 246, 0.4);
+                color: #f8fafc;
+                font-size: 13px;
+            ">
+                ☀️
+            </div>
+            <div style="
+                background: #0f172a;
+                color: #cbd5e1;
+                font-size: 10px;
+                font-weight: 800;
+                padding: 1px 5px;
+                border-radius: 6px;
+                border: 1px solid #475569;
+                white-space: nowrap;
+                margin-top: -5px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            ">
+                ${(power !== undefined ? power : 0).toFixed(1)}k
+            </div>
+        </div>
+    `,
+    iconSize: [50, 50],
+    iconAnchor: [25, 25],
+    popupAnchor: [0, -25]
+});
+
+// Sala Nova Icon
+const getSalaNovaIcon = (isLiberated) => new L.divIcon({
+    className: 'sala-nova-icon',
+    html: `
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('sala_nova_001');}" style="
+            background: ${isLiberated ? 'linear-gradient(135deg, #10b981, #047857)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'};
+            border: 3px solid ${isLiberated ? '#facc15' : '#ffffff'};
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 18px ${isLiberated ? 'rgba(16, 185, 129, 0.95)' : 'rgba(59, 130, 246, 0.85)'};
+            cursor: pointer;
+            pointer-events: auto;
+        ">
+            <span style="font-size: 20px; line-height: 1;">🏛️</span>
+            <span style="
+                position: absolute;
+                bottom: -7px;
+                background: ${isLiberated ? '#10b981' : '#1e293b'};
+                color: #ffffff;
+                font-size: 9px;
+                font-weight: 800;
+                border-radius: 4px;
+                padding: 1px 5px;
+                white-space: nowrap;
+                border: 1px solid rgba(255,255,255,0.4);
+            ">${isLiberated ? 'ALLIBERADA' : 'ASSEMBLEA'}</span>
+        </div>
+    `,
+    iconSize: [44, 44],
+    iconAnchor: [22, 22],
+    popupAnchor: [0, -24]
+});
+
+// Pavelló Icon
+const getPavelloIcon = (isLiberated) => new L.divIcon({
+    className: 'pavello-icon',
+    html: `
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('pavello_001');}" style="
+            background: ${isLiberated ? 'linear-gradient(135deg, #f59e0b, #b45309)' : 'linear-gradient(135deg, #8b5cf6, #6d28d9)'};
+            border: 3px solid ${isLiberated ? '#10b981' : '#ffffff'};
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px ${isLiberated ? 'rgba(245, 158, 11, 0.95)' : 'rgba(139, 92, 246, 0.85)'};
+            cursor: pointer;
+            pointer-events: auto;
+        ">
+            <span style="font-size: 22px; line-height: 1;">🏟️</span>
+            <span style="
+                position: absolute;
+                bottom: -7px;
+                background: ${isLiberated ? '#f59e0b' : '#1e293b'};
+                color: #ffffff;
+                font-size: 9px;
+                font-weight: 800;
+                border-radius: 4px;
+                padding: 1px 5px;
+                white-space: nowrap;
+                border: 1px solid rgba(255,255,255,0.4);
+            ">${isLiberated ? 'COOPERATIVA' : 'PAVELLÓ'}</span>
+        </div>
+    `,
+    iconSize: [48, 48],
+    iconAnchor: [24, 24],
+    popupAnchor: [0, -26]
+});
+
+const badIconCache = {};
+const getBadIcon = (type) => {
+    if (badIconCache[type]) return badIconCache[type];
+    let emoji = '🔥';
+    let borderColor = '#d35400';
+    let title = 'Amenaça ecològica';
+    if (type === 'camp_golf') {
+        emoji = '💧';
+        borderColor = '#2980b9';
+        title = "Camp de golf (Sobreexplotació d'aigua)";
+    } else if (type === 'piscines_clim') {
+        emoji = '🏊';
+        borderColor = '#16a085';
+        title = "Piscina climatitzada (Evaporació)";
+    } else if (type === 'bomba_calor') {
+        emoji = '❄️';
+        borderColor = '#8e44ad';
+        title = "Bomba de calor ineficient";
+    } else if (type === 'estufes_terrasses') {
+        emoji = '🔥';
+        borderColor = '#e67e22';
+        title = "Estufes de terrasses (Malgastament tèrmic)";
+    }
+    const icon = new L.divIcon({
+        className: 'custom-bad-icon',
+        html: `
+            <div title="${title}" style="background: white; border-radius: 50%; padding: 3px; box-shadow: 0 4px 10px rgba(0,0,0,0.35); border: 2.5px solid ${borderColor}; cursor: pointer; pointer-events: auto; display: flex; align-items: center; justify-content: center; width: 34px; height: 34px;">
+                <span style="font-size: 18px; line-height: 1;">${emoji}</span>
+            </div>
+        `,
+        iconSize: [34, 34],
+        iconAnchor: [17, 17],
+        popupAnchor: [0, -18]
+    });
+    badIconCache[type] = icon;
+    return icon;
+};
+
+const MapEventListener = ({ lastDamageEvent, addDamageText, onMapClickRoof }) => {
     const map = useMap();
+    useMapEvents({
+        click: (e) => {
+            if (onMapClickRoof) {
+                onMapClickRoof(e.latlng, e.containerPoint);
+            }
+        }
+    });
     React.useEffect(() => {
         if (lastDamageEvent) {
             const pt = map.latLngToContainerPoint([lastDamageEvent.lat, lastDamageEvent.lng]);
@@ -60,198 +302,166 @@ const MapEventListener = ({ lastDamageEvent, addDamageText }) => {
     return null;
 };
 
-const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onEnemyClick, clearedBads, onBadNodeClick, lastDamageEvent, children, isEditorMode, mapType = 'ortho', isMobileHudExpanded }) => {
-    const position = gisData.center; // Sant Jordi Desvalls center
+const getMinigameName = (inst) => {
+    if (inst.id === 'pavello_001') return 'Gestió de Cooperativa (Tycoon)';
+    if (inst.type === 'sala_nova' || inst.type === 'pavello') return 'Assemblea Comunitària';
+    if (inst.minigame === 'connect') return 'Connecta el cablejat';
+    if (inst.minigame === 'slider') return "Sintonitza l'inversor";
+    if (inst.minigame === 'rhythm') return 'Freqüència de xarxa (Ritme)';
+    if (inst.minigame === 'quiz') return 'Quiz de sobirania';
+    if (inst.minigame === 'balance') return 'Balanç energètic';
+    if (inst.power < 3.5) return 'Connecta el cablejat';
+    if (inst.power < 5) return "Sintonitza l'inversor";
+    return 'Balanç energètic';
+};
+
+const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onEnemyClick, clearedBads, onBadNodeClick, lastDamageEvent, children, isEditorMode, mapType = 'ortho', isMobileHudExpanded, contagionWave, nodePowers }) => {
+    const position = gisData.center;
     const [feedbackItems, setFeedbackItems] = React.useState([]);
     const [activeInfo, setActiveInfo] = React.useState(null);
     const [lastInteraction, setLastInteraction] = React.useState(null);
 
-
-    // Audio Context Ref
-    const audioCtxRef = React.useRef(null);
-
-    React.useEffect(() => {
-        // Initialize Audio Context on first user interaction (browser policy)
-        const initAudio = () => {
-            if (!audioCtxRef.current) {
-                audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        };
-        window.addEventListener('click', initAudio, { once: true });
-        return () => window.removeEventListener('click', initAudio);
-    }, []);
-
-    const playTocSound = () => {
-        if (!audioCtxRef.current) return;
-        const ctx = audioCtxRef.current;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(150, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.1);
-
-        gain.gain.setValueAtTime(0.5, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.1);
-    };
-
-    const playEnemyHitSound = () => {
-        if (!audioCtxRef.current) return;
-        const ctx = audioCtxRef.current;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(80, ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(20, ctx.currentTime + 0.2);
-
-        gain.gain.setValueAtTime(0.8, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start();
-        osc.stop(ctx.currentTime + 0.2);
-    };
+    const playTocSound = () => SoundManager.playSFX('click');
+    const playEnemyHitSound = () => SoundManager.playSFX('defeat');
 
     const triggerFeedback = (power, containerPoint) => {
-        playTocSound(); // TOC!
-
-        // Calculate Values
+        playTocSound();
         const energy = power * 1350;
         const savedMoney = Math.round(energy * 0.18);
         const savedCO2 = Math.round(energy * 0.29);
+        const uniqueId = Date.now() + '-' + Math.random();
 
-        // Add Visual Feedback with more spacing
-        // Y goes UP (negative) for floating text
         const newFeedbacks = [
-            { id: Date.now() + 'money', x: containerPoint.x, y: containerPoint.y - 50, text: `+${savedMoney} €`, icon: <Coins size={24} />, type: 'money' },
-            { id: Date.now() + 'co2', x: containerPoint.x, y: containerPoint.y - 120, text: `-${savedCO2} kg CO2`, type: 'co2' },
-            { id: Date.now() + 'bad', x: containerPoint.x, y: containerPoint.y - 190, icon: <Ban size={24} />, text: 'Especulació', type: 'bad' }
+            { id: uniqueId + '-money', x: containerPoint.x, y: containerPoint.y - 50, text: `+${savedMoney} €`, icon: <Coins size={24} />, type: 'money' },
+            { id: uniqueId + '-co2', x: containerPoint.x, y: containerPoint.y - 120, text: `-${savedCO2} kg CO2`, type: 'co2' },
+            { id: uniqueId + '-bad', x: containerPoint.x, y: containerPoint.y - 190, icon: <Ban size={24} />, text: 'Especulació', type: 'bad' }
         ];
 
         setFeedbackItems(prev => [...prev, ...newFeedbacks]);
-
-        // Cleanup after animation
         setTimeout(() => {
             setFeedbackItems(prev => prev.filter(item => !newFeedbacks.find(f => f.id === item.id)));
         }, 3000);
     };
 
-    // Use useCallback so it's stable for the useEffect listener
     const addDamageText = React.useCallback((containerPoint, evt) => {
         playEnemyHitSound();
+        const feedbackId = 'damage-' + evt.id + '-' + Math.random();
         const newFeedback = {
-            id: evt.id,
+            id: feedbackId,
             x: containerPoint.x,
             y: containerPoint.y - 30,
             text: evt.text,
-            type: evt.type === 'critical' ? 'bad' : 'damage',
+            type: evt.type === 'critical' ? 'bad' : evt.type === 'defeat' ? 'money' : 'damage',
             icon: evt.type === 'critical' ? <Ban size={20} /> : <ShieldAlert size={20} />
         };
 
         setFeedbackItems(prev => [...prev, newFeedback]);
-
         setTimeout(() => {
-            setFeedbackItems(prev => prev.filter(item => item.id !== evt.id));
+            setFeedbackItems(prev => prev.filter(item => item.id !== feedbackId));
         }, 3000);
     }, []);
 
-    const handleLiberateAttempt = (id, power, owner, latlng, containerPoint) => {
-        // Always show info card first
-        setActiveInfo({
-            id, owner, power,
-            x: containerPoint.x,
-            y: containerPoint.y + 40,
-            isLiberated: liberatedNodes && liberatedNodes.has(id)
-        });
+    const handleLiberateAttempt = (inst, latlng, containerPoint) => {
+        // If an enemy is currently attacking this rooftop, expelling the enemy happens IMMEDIATELY,
+        // and we STILL proceed to launch the minigame so the user can play or defend!
+        const attackingEnemy = enemies?.find(e => e.targetId === inst.id && (e.isAttacking || e.reachedTarget));
+        if (attackingEnemy && onEnemyClick) {
+            onEnemyClick(attackingEnemy.id);
+        }
 
-        if (!liberatedNodes || liberatedNodes.has(id)) return; // Already liberated
+        const posX = containerPoint ? containerPoint.x : (window.innerWidth / 2);
+        const posY = containerPoint ? (containerPoint.y + 40) : (window.innerHeight / 2);
 
-        // Track for feedback
-        setLastInteraction({ id, power, x: containerPoint.x, y: containerPoint.y });
-
-        // Delegate to Parent (App.jsx) to decide on Mini-game
-        onLiberateNode(id, power, owner, latlng, containerPoint);
+        // Trigger minigame play
+        setLastInteraction({ id: inst.id, power: inst.power, x: posX, y: posY });
+        onLiberateNode(inst.id, inst.power, inst.owner, latlng, containerPoint);
     };
 
-    // Trigger feedback when a valid interaction finally completes
+    const handleMapClickRoof = (latlng, containerPoint) => {
+        if (isEditorMode) return;
+        // Check if user clicked anywhere on or near a rooftop building (within 75m)
+        let closest = null;
+        let minDist = 75; // generous click radius so clicking any roof of a house works!
+        gisData.installations.forEach(inst => {
+            if (inst.type !== 'rooftop' && inst.type !== 'pavello' && inst.type !== 'sala_nova') return;
+            const dLat = (inst.coordinates[0] - latlng.lat) * 111072;
+            const dLng = (inst.coordinates[1] - latlng.lng) * 82660;
+            const dist = Math.hypot(dLat, dLng);
+            if (dist < minDist) {
+                minDist = dist;
+                closest = inst;
+            }
+        });
+        if (closest) {
+            handleLiberateAttempt(closest, latlng, containerPoint);
+        }
+    };
+
     React.useEffect(() => {
-        if (lastInteraction && liberatedNodes.has(lastInteraction.id) && !lastInteraction.played) {
+        window.__triggerRooftop = (id) => {
+            const inst = gisData.installations.find(i => i.id === id);
+            if (inst) {
+                handleLiberateAttempt(inst);
+            }
+        };
+        return () => {
+            delete window.__triggerRooftop;
+        };
+    }, [enemies, onEnemyClick, onLiberateNode]);
+
+    React.useEffect(() => {
+        if (lastInteraction && liberatedNodes && liberatedNodes.has(lastInteraction.id) && !lastInteraction.played) {
             triggerFeedback(lastInteraction.power, { x: lastInteraction.x, y: lastInteraction.y - 40 });
-
-            // Mark as played to prevent duplicate feedback
             setLastInteraction(prev => ({ ...prev, played: true }));
-
-            // Optionally update UI card if still visible
-            setActiveInfo(prev => prev && prev.id === lastInteraction.id ? { ...prev, isLiberated: true } : prev);
         }
     }, [liberatedNodes, lastInteraction]);
 
-    // Auto-hide info card after 3 seconds
-    React.useEffect(() => {
-        let timer;
-        if (activeInfo) {
-            timer = setTimeout(() => {
-                setActiveInfo(null);
-            }, 3000);
-        }
-        return () => {
-            if (timer) clearTimeout(timer);
-        };
-    }, [activeInfo]);
-
-    // CSS Filter applied to the wrapper, NOT the MapContainer directly (safer for Leaflet)
-    const wrapperStyle = {
-        height: '100vh',
-        width: '100%',
-        position: 'relative',
-        filter: isEditorMode ? 'none' : `grayscale(${corruptionLevel}%) contrast(${100 + corruptionLevel / 2}%) hue-rotate(-${corruptionLevel / 5}deg)`,
-        transition: 'filter 0.5s ease-out' // Faster transition for responsiveness
-    };
-
     return (
-        <div className="map-wrapper" style={wrapperStyle}>
-            {/* Minigame Overlay Removed from here */}
+        <div className="map-wrapper" style={{ height: '100vh', width: '100%', position: 'relative' }}>
+            {/* Filter applies ONLY to map tiles, preserving 100% saturation for markers & UI */}
+            <style>{`
+                .leaflet-tile-pane {
+                    filter: ${isEditorMode ? 'none' : `grayscale(${corruptionLevel}%) contrast(${100 + corruptionLevel / 2}%)`};
+                    transition: filter 0.6s ease-out;
+                }
+                @keyframes sabotageShake {
+                    0% { transform: scale(1.05) rotate(-6deg); }
+                    100% { transform: scale(1.18) rotate(6deg); }
+                }
+            `}</style>
 
             <MapContainer
                 center={position}
-                zoom={16}
-                style={{ height: '100%', width: '100%', borderRadius: '12px' }}
+                zoom={15}
+                style={{ height: '100%', width: '100%' }}
                 zoomControl={false}
             >
-                <MapEventListener lastDamageEvent={lastDamageEvent} addDamageText={addDamageText} />
+                <MapEventListener lastDamageEvent={lastDamageEvent} addDamageText={addDamageText} onMapClickRoof={handleMapClickRoof} />
 
                 {mapType === 'ortho' ? (
                     <TileLayer
                         url="https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857/{z}/{x}/{y}.png"
-                        attribution='&copy; <a href="https://www.icgc.cat">Institut Cartogràfic i Geològic de Catalunya</a>'
+                        attribution='&copy; <a href="https://www.icgc.cat">ICGC</a>'
                     />
                 ) : (
                     <TileLayer
                         url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                        attribution='&copy; CARTO'
                     />
                 )}
 
-                {/* GIS Speculation Overlays (Priority Zones) */}
                 {gisData.speculationOverlays && gisData.speculationOverlays.map(overlay => (
                     <ImageOverlay
                         key={overlay.id}
                         url={overlay.url}
                         bounds={overlay.bounds}
-                        opacity={isEditorMode ? 1.0 : overlay.opacity * (corruptionLevel / 100)} // Variable opacity based on corruption
+                        opacity={isEditorMode ? 1.0 : overlay.opacity * (corruptionLevel / 100)}
                         zIndex={10}
+                        interactive={false}
                     />
                 ))}
 
-                {/* Custom Saved Zones (Polygons) */}
-                {gisData.zones && gisData.zones.map(zone => {
+                {!isEditorMode && gisData.zones && gisData.zones.map(zone => {
                     const zoneColors = {
                         prioritaria: '#e67e22',
                         apta: '#3498db',
@@ -261,11 +471,13 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                         <Polygon
                             key={zone.id}
                             positions={zone.points}
+                            interactive={false}
                             pathOptions={{
                                 color: zoneColors[zone.type] || '#7f8c8d',
                                 fillColor: zoneColors[zone.type] || '#95a5a6',
-                                fillOpacity: 0.4,
-                                weight: 2
+                                fillOpacity: 0.25,
+                                weight: 2,
+                                interactive: false
                             }}
                         />
                     );
@@ -273,59 +485,128 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
 
                 {children}
 
-                {/* Good Energy Installations (Rooftop Solar) */}
+                {/* 180m Contagion Wave Circle */}
+                {contagionWave && (
+                    <Circle
+                        center={contagionWave.center}
+                        radius={contagionWave.radius}
+                        interactive={false}
+                        pathOptions={{
+                            color: '#10b981',
+                            fillColor: '#10b981',
+                            fillOpacity: 0.22,
+                            weight: 3,
+                            dashArray: '8, 8',
+                            interactive: false
+                        }}
+                    />
+                )}
+
+                {/* Installations: Prominent visual markers (handled by ZoneEditor when in editor mode) */}
                 {!isEditorMode && gisData.installations.map((inst) => {
                     if (inst.type !== 'rooftop' && inst.type !== 'pavello' && inst.type !== 'sala_nova') return null;
 
-
                     const isLiberated = liberatedNodes && liberatedNodes.has(inst.id);
+                    const currentPower = nodePowers && nodePowers[inst.id] !== undefined ? nodePowers[inst.id] : inst.power;
 
+                    // Pick explicit marker icon with high zIndex so markers are always interactable
+                    let markerIcon;
+                    let zIndex = isLiberated ? 800 : 750;
 
-                    // Dynamic Radius based on Power
-                    let radius = 6;
-                    if (inst.power >= 5 && inst.power < 10) radius = 10;
-                    if (inst.power >= 10) radius = 20;
-                    if (inst.type === 'pavello') radius = 35; // Pavello is big
-                    if (inst.type === 'sala_nova') radius = 25; // Sala Nova is medium-big
+                    if (inst.type === 'sala_nova') {
+                        markerIcon = getSalaNovaIcon(isLiberated);
+                        zIndex = 850;
+                    } else if (inst.type === 'pavello') {
+                        markerIcon = getPavelloIcon(isLiberated);
+                        zIndex = 900;
+                    } else if (isLiberated) {
+                        markerIcon = liberatedRooftopIcon(currentPower, inst.id);
+                    } else {
+                        markerIcon = pendingRooftopIcon(currentPower, inst.id);
+                    }
+
+                    const attackingEnemy = enemies?.find(en => en.targetId === inst.id && (en.isAttacking || en.reachedTarget));
 
                     return (
-                        <Circle
-                            key={inst.id}
-                            center={inst.coordinates}
-                            pathOptions={{
-                                color: isLiberated ? ((inst.type === 'pavello' || inst.type === 'sala_nova') ? '#f1c40f' : '#2ecc71') : '#7f8c8d',
-                                fillColor: isLiberated ? ((inst.type === 'pavello' || inst.type === 'sala_nova') ? '#f39c12' : '#27ae60') : '#95a5a6',
-                                fillOpacity: isLiberated ? 0.8 : 0.4,
-                                weight: (inst.type === 'pavello' || inst.type === 'sala_nova') ? 5 : (isLiberated ? 3 : 1)
-                            }}
-                            radius={radius}
-                            className={isLiberated ? 'pulsing-node' : ''}
+                        <Marker
+                            key={`${inst.id}-${isLiberated ? 'lib' : 'pend'}`}
+                            position={inst.coordinates}
+                            icon={markerIcon}
+                            zIndexOffset={zIndex}
                             eventHandlers={{
-                                click: (e) => handleLiberateAttempt(inst.id, inst.power, inst.owner, e.latlng, e.containerPoint)
+                                click: (e) => {
+                                    if (attackingEnemy && onEnemyClick) {
+                                        onEnemyClick(attackingEnemy.id);
+                                    }
+                                    handleLiberateAttempt(inst, e.latlng, e.containerPoint);
+                                },
+                                mousedown: (e) => {
+                                    if (attackingEnemy && onEnemyClick) {
+                                        onEnemyClick(attackingEnemy.id);
+                                    }
+                                    handleLiberateAttempt(inst, e.latlng, e.containerPoint);
+                                }
                             }}
-                        />
+                        >
+                            <Popup
+                                offset={[0, -20]}
+                                closeButton={true}
+                                autoPan={false}
+                                className="rooftop-map-popup"
+                            >
+                                <div style={{ textAlign: 'center', fontFamily: 'var(--font-main)', padding: '2px 4px', userSelect: 'none' }}>
+                                    <div style={{ fontWeight: 800, fontSize: '14px', color: '#f8fafc', marginBottom: '2px' }}>
+                                        {inst.owner}
+                                    </div>
+                                    <div style={{ color: attackingEnemy ? '#ef4444' : (isLiberated ? '#10b981' : '#f59e0b'), fontWeight: 'bold', fontSize: '12px', marginBottom: '8px' }}>
+                                        {attackingEnemy ? '🚨 SOTA ATAC DE HOMES DE NEGRE!' : (isLiberated ? `⚡ Alliberada (${currentPower.toFixed(1)} kW)` : `🎮 ${getMinigameName(inst)} (${currentPower.toFixed(1)} kW)`)}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleLiberateAttempt(inst);
+                                            const closeBtn = e.target.closest?.('.leaflet-popup')?.querySelector('.leaflet-popup-close-button');
+                                            if (closeBtn) closeBtn.click();
+                                        }}
+                                        style={{
+                                            background: attackingEnemy ? 'linear-gradient(135deg, #ef4444, #b91c1c)' : (isLiberated ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)' : 'linear-gradient(135deg, #10b981, #059669)'),
+                                            color: '#ffffff',
+                                            border: 'none',
+                                            borderRadius: '8px',
+                                            padding: '8px 18px',
+                                            fontSize: '12px',
+                                            fontWeight: 800,
+                                            cursor: 'pointer',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            gap: '6px',
+                                            boxShadow: '0 3px 8px rgba(0,0,0,0.3)',
+                                            transition: 'transform 0.1s'
+                                        }}
+                                    >
+                                        <Play size={14} fill="#ffffff" /> {attackingEnemy ? '🛡️ EXPULSAR I JUGAR' : (isLiberated ? 'REJUGAR MINIJOC' : 'JUGAR ARA')}
+                                    </button>
+                                </div>
+                            </Popup>
+                        </Marker>
                     );
                 })}
 
-                {/* Bad Energy Projects (Speculation) */}
+                {/* Bad Energy Projects */}
                 {!isEditorMode && gisData.installations.map((inst) => (
                     inst.type === 'industrial_project' && (
                         <Circle
                             key={inst.id}
                             center={inst.coordinates}
                             pathOptions={{ color: '#2c3e50', fillColor: '#95a5a6', fillOpacity: 0.6, dashArray: '10, 10' }}
-                            radius={150} // Large impact area
-                        >
-                            <Popup>
-                                <strong>PROJECTE ESPECULATIU</strong><br />
-                                Amenaça: {inst.threatLevel.toUpperCase()}<br />
-                                <em>Drenant recursos...</em>
-                            </Popup>
-                        </Circle>
+                            radius={150}
+                            interactive={false}
+                        />
                     )
                 ))}
 
-                {/* Environmental Bads (Drains) */}
+                {/* Environmental Threats */}
                 {!isEditorMode && gisData.environmentalBads.map((bad) => {
                     if (clearedBads && clearedBads.has(bad.id)) return null;
 
@@ -333,7 +614,8 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                         <Marker
                             key={bad.id}
                             position={bad.coordinates}
-                            icon={badIcon}
+                            icon={getBadIcon(bad.type)}
+                            zIndexOffset={400}
                             eventHandlers={{
                                 click: () => {
                                     if (onBadNodeClick) onBadNodeClick(bad.id, bad.type);
@@ -343,32 +625,53 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                     );
                 })}
 
-                {/* ENEMIES (The Suits) */}
-                {!isEditorMode && enemies && enemies.map((enemy) => {
-                    return (
+                {/* ENEMIES (The Suits / Homes de negre) */}
+                {!isEditorMode && enemies && enemies.map((enemy) => (
+                    <React.Fragment key={`enemy-frag-${enemy.id}`}>
+                        {enemy.isAttacking && (
+                            <Circle
+                                center={[enemy.lat, enemy.lng]}
+                                radius={22}
+                                interactive={false}
+                                pathOptions={{
+                                    color: '#ef4444',
+                                    fillColor: '#ef4444',
+                                    fillOpacity: 0.35,
+                                    weight: 3,
+                                    dashArray: '5, 5',
+                                    interactive: false
+                                }}
+                            />
+                        )}
                         <Marker
-                            key={enemy.id}
+                            key={`enemy-marker-${enemy.id}`}
                             position={[enemy.lat, enemy.lng]}
-                            icon={suitIcon}
+                            icon={getSuitIcon(enemy.isAttacking)}
+                            zIndexOffset={9999}
                             eventHandlers={{
-                                click: () => {
+                                click: (e) => {
+                                    L.DomEvent.stopPropagation(e);
+                                    if (onEnemyClick) onEnemyClick(enemy.id);
+                                },
+                                mousedown: (e) => {
+                                    L.DomEvent.stopPropagation(e);
                                     if (onEnemyClick) onEnemyClick(enemy.id);
                                 }
                             }}
                         />
-                    );
-                })}
+                    </React.Fragment>
+                ))}
 
             </MapContainer>
 
-            {/* Grid Overlay for Speculation Effect (High Corruption) */}
+            {/* Grid Overlay for High Corruption */}
             <div
                 className="speculation-grid-overlay"
                 style={{
                     position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 400,
                     backgroundImage: `linear-gradient(rgba(0,0,0,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.5) 1px, transparent 1px)`,
                     backgroundSize: '50px 50px',
-                    opacity: corruptionLevel > 50 ? (corruptionLevel - 50) / 50 : 0, // Only visible above 50%
+                    opacity: corruptionLevel > 50 ? (corruptionLevel - 50) / 50 : 0,
                     transition: 'opacity 0.5s'
                 }}
             ></div>
@@ -383,97 +686,6 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                     {item.icon} {item.text}
                 </div>
             ))}
-
-            {/* Custom Node Info Card (Active Popup Replacement) */}
-            {activeInfo && (
-                <div
-                    className="node-info-card"
-                    style={{ left: activeInfo.x, top: activeInfo.y }}
-                >
-                    <div className="node-info-close" onClick={() => setActiveInfo(null)}><X size={16} /></div>
-                    {activeInfo.isLiberated ?
-                        <TreeDeciduous size={32} color="#2ecc71" style={{ margin: '0 auto', display: 'block' }} /> :
-                        <Zap size={24} color="#7f8c8d" style={{ margin: '0 auto', display: 'block' }} />
-                    }
-                    <h3>{activeInfo.owner}</h3>
-                    <p style={{ margin: '5px 0', fontSize: '0.9rem' }}>Power: <strong>{activeInfo.power} kW</strong></p>
-                    <p style={{ margin: '5px 0', fontSize: '0.8rem', color: '#27ae60' }}>
-                        {activeInfo.isLiberated ? 'SOBIRANIA ENERGÈTICA' : 'ACTIVAT'}
-                    </p>
-
-                </div>
-            )}
-
-            {/* HUD Overlay for Corruption Level */}
-            <div className={`speculation-hud ${isMobileHudExpanded ? 'expanded' : 'collapsed'}`}>
-                <h3 style={{ margin: '0 0 10px 0', fontSize: '1rem', color: '#333' }}>NIvell d'Especulació</h3>
-                <div style={{ width: '100%', height: '12px', background: '#ecf0f1', borderRadius: '6px', overflow: 'hidden', marginBottom: '10px' }}>
-                    <div style={{ width: `${corruptionLevel}%`, height: '100%', background: corruptionLevel > 80 ? '#e74c3c' : corruptionLevel > 50 ? '#f39c12' : '#2ecc71', transition: 'width 0.3s' }}></div>
-                </div>
-                <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', textAlign: 'right', fontSize: '0.9rem' }}>{Math.round(corruptionLevel)}%</p>
-
-                {/* Speculators & Coins Legend */}
-                <div style={{ borderTop: '1px solid #bdc3c7', paddingTop: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#2c3e50', marginRight: '5px' }}>Amenaça ({enemies ? enemies.length : 0}):</span>
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '10px' }}>
-                        {enemies && enemies.map((enemy, i) => (
-                            <div key={`suit-${enemy.id}`} title="Executiu Especulador" style={{ animation: 'fadeIn 0.5s' }}>
-                                {/* Custom Suit Man Icon */}
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2c3e50" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <circle cx="12" cy="7" r="4" />
-                                    <path d="M5.5 21v-2a4 4 0 0 1 4-4h5a4 4 0 0 1 4 4v2" />
-                                    <path d="M12 11l-1 4.5l1 1.5l1-1.5l-1-4.5" fill="#e74c3c" stroke="none" /> {/* Red Tie for Danger */}
-                                    <path d="M12 11l-1 4.5l1 1.5l1-1.5l-1-4.5" stroke="#2c3e50" strokeWidth="1" fill="none" />
-                                </svg>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#f1c40f', textShadow: '0 1px 1px rgba(0,0,0,0.1)', marginRight: '5px' }}>Botí:</span>
-                    </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2px', marginBottom: '10px' }}>
-                        {Array.from({ length: (gisData.installations.filter(i => i.type === 'rooftop').length - liberatedNodes.size) + 3 }).map((_, i) => (
-                            <div key={`coin-${i}`} title="Euro" style={{
-                                width: '16px', height: '16px',
-                                borderRadius: '50%',
-                                background: 'linear-gradient(135deg, #f1c40f 0%, #f39c12 100%)',
-                                border: '1px solid #d35400',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontSize: '10px', fontWeight: 'bold', color: '#945c08',
-                                boxShadow: '0 1px 2px rgba(0,0,0,0.2)',
-                                animation: 'fadeIn 0.5s'
-                            }}>
-                                €
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Plater Legend */}
-                    <div style={{ borderTop: '1px solid #bdc3c7', paddingTop: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '5px' }}>
-                            <span style={{ fontSize: '0.8rem', fontWeight: 'bold', color: '#2c3e50', marginRight: '5px' }}>Llegenda Plater:</span>
-                        </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '12px', height: '12px', background: '#e67e22', borderRadius: '2px', border: '1px solid #d35400' }}></div>
-                                <span style={{ fontSize: '0.75rem', color: '#2c3e50' }}>Zona Prioritària</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '12px', height: '12px', background: '#3498db', borderRadius: '2px', border: '1px solid #2980b9' }}></div>
-                                <span style={{ fontSize: '0.75rem', color: '#2c3e50' }}>Zona Apta</span>
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: '12px', height: '12px', background: '#f1c40f', borderRadius: '50%', border: '2px solid #f39c12' }}></div>
-                                <span style={{ fontSize: '0.75rem', color: '#2c3e50' }}>Comunitat Energètica</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
     );
 };

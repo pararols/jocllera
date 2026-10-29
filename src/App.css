@@ -15,7 +15,6 @@
 
   /* UI Variables */
   --font-main: 'Outfit', sans-serif;
-  /* Example modern font */
   --border-radius: 12px;
 }
 
@@ -27,7 +26,6 @@ body {
   color: var(--color-metal-dark);
   transition: background-color 0.5s ease;
   overflow: hidden;
-  /* Prevent scroll */
 }
 
 #root {
@@ -53,10 +51,8 @@ body {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  /* CRITICAL: Allows clicks to pass through to the map */
   background: radial-gradient(circle, transparent 50%, rgba(44, 62, 80, 0.8) 100%);
   z-index: 400;
-  /* Below HUD (1000) but above Map (1) */
   opacity: 0;
   transition: opacity 0.5s ease-in-out;
   mix-blend-mode: multiply;
@@ -64,7 +60,6 @@ body {
 
 .speculation-active {
   opacity: 1;
-  /* Make it fully visible when active */
 }
 
 /* Pulsing effect for Good Energy Nodes */
@@ -73,12 +68,10 @@ body {
     transform: scale(1);
     opacity: 0.8;
   }
-
   50% {
     transform: scale(1.2);
     opacity: 0.5;
   }
-
   100% {
     transform: scale(1);
     opacity: 0.8;
@@ -95,7 +88,6 @@ body {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-
   100% {
     opacity: 0;
     transform: scale(1.5) translateY(-100px);
@@ -113,32 +105,27 @@ body {
 
 .feedback-money {
   color: #2ecc71;
-  /* Green Money */
   font-size: 2.5rem;
 }
 
 .feedback-co2 {
   color: #7f8c8d;
-  /* Grey CO2 */
   font-size: 1.8rem;
 }
 
 .feedback-bad {
   color: #e74c3c;
-  /* Red Money Loss */
   font-size: 1.8rem;
 }
 
 .feedback-damage {
   color: #e67e22;
-  /* Orange Damage */
   font-size: 1.5rem;
   font-weight: 800;
 }
 
 .feedback-defeat {
   color: #3498db;
-  /* Neon Blue */
   font-size: 2rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -206,34 +193,69 @@ body {
 /* =========================================
    NODE INFO CARD (CUSTOM POPUP)
    ========================================= */
+.rooftop-map-popup .leaflet-popup-content-wrapper {
+  background: rgba(15, 23, 42, 0.95) !important;
+  color: #f8fafc !important;
+  border-radius: 14px !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.65), 0 0 20px rgba(16, 185, 129, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  padding: 2px !important;
+}
+
+.rooftop-map-popup .leaflet-popup-tip {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.rooftop-map-popup .leaflet-popup-content {
+  margin: 10px 14px !important;
+  line-height: 1.35 !important;
+}
+
+.rooftop-map-popup a.leaflet-popup-close-button {
+  color: #94a3b8 !important;
+  padding: 6px 8px !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+}
+
+.rooftop-map-popup a.leaflet-popup-close-button:hover {
+  color: #ffffff !important;
+}
+
 .node-info-card {
   position: absolute;
-  background: white;
+  background: var(--glass-bg, rgba(30, 41, 59, 0.85));
+  backdrop-filter: var(--glass-blur, blur(10px));
+  -webkit-backdrop-filter: var(--glass-blur, blur(10px));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   z-index: 1000;
-  width: 200px;
+  width: 220px;
   text-align: center;
   transform: translateX(-50%);
-  /* Center horizontally relative to left position */
   font-family: var(--font-main);
   animation: fadeIn 0.2s ease-out;
+  color: white;
 }
 
 .node-info-card h3 {
   margin: 0 0 5px 0;
   font-size: 1rem;
-  color: #2c3e50;
+  color: #ffffff;
 }
 
 .node-info-close {
   position: absolute;
   top: 5px;
-  right: 5px;
+  right: 8px;
   cursor: pointer;
   color: #95a5a6;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: bold;
   padding: 2px 6px;
 }
@@ -245,17 +267,14 @@ body {
 /* =========================================
    MODALS & UI
    ========================================= */
-
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(44, 62, 80, 0.9);
-  /* Dark background */
+  background: rgba(15, 23, 42, 0.8);
   z-index: 2000;
-  /* Above everything */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -263,90 +282,52 @@ body {
   animation: fadeIn 0.5s ease;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
 .modal-content {
-  background: #f3e5ab;
-  /* Earth Light */
+  background: var(--glass-bg, rgba(30, 41, 59, 0.9));
+  backdrop-filter: var(--glass-blur, blur(12px));
   padding: 2rem;
   border-radius: 16px;
   max-width: 500px;
   width: 90%;
   text-align: center;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  border: 4px solid #8c6b3e;
-  /* Earth Dark */
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.1));
   position: relative;
+  color: white;
 }
 
 .modal-content.victory {
-  background: #d4efff;
-  /* Skyish */
-  border-color: #3498db;
+  border-color: #2ecc71;
 }
 
 .modal-content h2 {
   font-size: 2rem;
   margin-top: 0;
-  color: #8c6b3e;
-  /* Earth Dark */
-  font-family: serif;
-  /* More literary feel */
-}
-
-.modal-content.victory h2 {
-  color: #2980b9;
+  color: #ffffff;
 }
 
 .modal-content p {
   font-size: 1.1rem;
   line-height: 1.6;
   margin-bottom: 1.5rem;
-  color: #2c3e50;
-}
-
-.modal-content .quote {
-  font-style: italic;
-  font-weight: bold;
-  font-size: 1.2rem;
-  color: #d35400;
+  color: var(--color-text-muted, #94a3b8);
 }
 
 .modal-content button {
-  background: #8c6b3e;
+  background: var(--color-primary, #3b82f6);
   color: white;
   border: none;
   padding: 1rem 2rem;
   font-size: 1.2rem;
-  border-radius: 8px;
+  border-radius: 50px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: bold;
-  box-shadow: 0 4px 0 #5d4526;
 }
 
 .modal-content button:hover {
-  background: #a07a46;
+  filter: brightness(1.1);
   transform: translateY(-2px);
-  box-shadow: 0 6px 0 #5d4526;
-}
-
-.modal-content button:active {
-  transform: translateY(0);
-  box-shadow: 0 2px 0 #5d4526;
-}
-
-.modal-content.victory button {
-  background: #3498db;
-  box-shadow: 0 4px 0 #2980b9;
 }
 
 /* --- Minigame Styles --- */
@@ -357,52 +338,43 @@ body {
   width: 100vw;
   height: 100vh;
   background: rgba(15, 23, 42, 0.6);
-  /* Modern dark overlay */
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 10000;
-  /* Extremely high to beat map filters */
   backdrop-filter: blur(8px);
-  /* Deeper blur */
   animation: fadeIn 0.3s ease-out;
 }
 
 .minigame-card {
-  background: rgba(44, 62, 80, 0.85);
+  background: rgba(30, 41, 59, 0.95);
   width: 95%;
   max-width: 1000px;
   border-radius: 16px;
   overflow: hidden;
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-  /* Subtle border */
-  border: 1px solid rgba(52, 152, 219, 0.5);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.4);
   backdrop-filter: blur(12px);
-  /* Glassmorphism on card */
   transform: translateZ(0);
-  /* Hardware accelerate */
 }
 
 .minigame-header {
-  background: rgba(52, 73, 94, 0.9);
+  background: rgba(15, 23, 42, 0.9);
   padding: 15px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: white;
-  border-bottom: 1px solid rgba(52, 152, 219, 0.3);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 .minigame-header h3 {
   margin: 0;
-  font-family: 'Orbitron', sans-serif;
-  /* Tech feel */
+  font-family: var(--font-display);
   font-size: 1.1rem;
   letter-spacing: 1px;
   text-transform: uppercase;
-  background: linear-gradient(90deg, #3498db, #2ecc71);
+  background: linear-gradient(90deg, #3b82f6, #10b981);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -419,14 +391,13 @@ body {
 }
 
 .close-btn:hover {
-  color: #e74c3c;
+  color: #ef4444;
 }
 
 .minigame-content {
   padding: 20px;
   position: relative;
   height: 420px;
-  /* Fixed height for interaction area */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -434,11 +405,10 @@ body {
 }
 
 .blue-print-bg {
-  /* Tech Grid Background */
-  background-color: rgb(30, 41, 59);
+  background-color: rgb(15, 23, 42);
   background-image:
-    linear-gradient(rgba(52, 152, 219, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(52, 152, 219, 0.1) 1px, transparent 1px);
+    linear-gradient(rgba(59, 130, 246, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.08) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
@@ -446,8 +416,7 @@ body {
   width: 100%;
   height: 100%;
   touch-action: none;
-  /* Prevent scroll on mobile while playing */
-  filter: drop-shadow(0 0 5px rgba(52, 152, 219, 0.5));
+  filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.3));
 }
 
 .success-overlay {
@@ -456,17 +425,16 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(39, 174, 96, 0.2);
+  background: rgba(16, 185, 129, 0.15);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: #2ecc71;
-  font-family: 'Orbitron', sans-serif;
+  color: #10b981;
   animation: fadeIn 0.3s ease-out;
   pointer-events: none;
   border-radius: 12px;
-  text-shadow: 0 0 20px rgba(46, 204, 113, 0.5);
+  text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
 }
 
 .success-overlay h2 {
@@ -476,10 +444,9 @@ body {
 
 .minigame-instruction {
   margin-top: 10px;
-  color: #ecf0f1;
-  font-family: 'Orbitron', sans-serif;
+  color: #f1fafc;
   font-size: 0.9rem;
-  opacity: 0.8;
+  opacity: 0.9;
   text-align: center;
 }
 
@@ -492,421 +459,46 @@ body {
     transform: scale(0.8) translateY(20px);
     opacity: 0;
   }
-
   100% {
     transform: scale(1) translateY(0);
     opacity: 1;
   }
 }
 
-@keyframes pulse-green {
-  0% {
-    transform: translateX(-50%) scale(1);
-    box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
-  }
-
-  50% {
-    transform: translateX(-50%) scale(1.05);
-    box-shadow: 0 12px 24px rgba(46, 204, 113, 0.6);
-  }
-
-  100% {
-    transform: translateX(-50%) scale(1);
-    box-shadow: 0 8px 16px rgba(46, 204, 113, 0.4);
-  }
-}
-
-.final-phase-btn:hover {
-  filter: brightness(1.1);
-  transform: translateX(-50%) scale(1.1) !important;
-}
-
 /* =========================================
-   WELCOME SCREEN
+   SPECULATION HUD & FLOATING HUD ELEMENTS
    ========================================= */
-.welcome-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100dvh;
-  z-index: 30000;
-  background-image: url(/cinematics/celdoni_intro.png);
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.welcome-gradient {
+.speculation-hud {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100dvh;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.7) 50%, rgba(0, 0, 0, 0.4) 100%);
-  z-index: 0;
-}
-
-.welcome-container {
-  position: relative;
-  z-index: 1;
-  max-width: 800px;
-  width: 100%;
-  padding: 40px;
-  background: rgba(20, 20, 25, 0.6);
+  top: 110px;
+  right: 20px;
+  z-index: 1000;
+  background: rgba(30, 41, 59, 0.85);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  text-align: center;
-  box-sizing: border-box;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.welcome-title {
-  font-size: 3rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 4px;
-  margin: 0 0 10px 0;
-  color: #f1c40f;
-  text-shadow: 0 2px 10px rgba(241, 196, 15, 0.3);
-}
-
-.welcome-subtitle {
-  font-size: 1.5rem;
-  font-weight: 300;
-  margin: 0 0 30px 0;
-  color: #ecf0f1;
-  letter-spacing: 1px;
-}
-
-.welcome-text {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 30px;
-  color: #bdc3c7;
-  text-align: left;
-}
-
-.welcome-mission {
-  text-align: left;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 40px;
-}
-
-.welcome-mission h3 {
-  margin: 0 0 15px 0;
-  color: #f1c40f;
-  font-size: 1.2rem;
-}
-
-.welcome-mission ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.welcome-mission li {
-  display: flex;
-  align-items: flex-start;
-}
-
-.welcome-mission li span {
-  margin-right: 10px;
-  font-size: 1.2rem;
-}
-
-.welcome-ready {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-bottom: 25px;
-  color: #ecf0f1;
-}
-
-.welcome-btn {
-  background: linear-gradient(90deg, #f1c40f 0%, #f39c12 100%);
-  color: #000;
-  border: none;
-  padding: 16px 40px;
-  font-size: 1.2rem;
-  font-weight: bold;
-  border-radius: 50px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.welcome-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(241, 196, 15, 0.6);
-}
-
-
-/* =========================================
-   SPECULATION HUD & HEADER TITLE
-   ========================================= */
-.game-header h1 {
-  font-size: 1.2rem;
-  margin: 0;
-  color: var(--color-earth-dark);
-}
-
-.speculation-hud {
-  position: absolute;
-  top: 80px;
-  right: 20px;
-  z-index: 1000;
-  background: white;
   padding: 15px;
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  max-width: 250px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  width: 250px;
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
+  color: white;
 }
 
 /* =========================================
    RESPONSIVE DESIGN (MOBILE)
    ========================================= */
 @media (max-width: 768px) {
-
-  /* Welcome Screen Mobile */
-  .welcome-container {
-    padding: 20px;
-  }
-
-  .welcome-title {
-    font-size: 1.8rem;
-    letter-spacing: 2px;
-  }
-
-  .welcome-subtitle {
-    font-size: 1.1rem;
-    margin-bottom: 20px;
-  }
-
-  .welcome-text {
-    font-size: 0.95rem;
-    margin-bottom: 20px;
-  }
-
-  .welcome-mission {
-    padding: 15px;
-    margin-bottom: 25px;
-  }
-
-  .welcome-mission h3 {
-    font-size: 1rem;
-  }
-
-  .welcome-mission li {
-    font-size: 0.95rem;
-  }
-
-  .welcome-ready {
-    font-size: 1rem;
-    margin-bottom: 20px;
-  }
-
-  .welcome-btn {
-    padding: 14px 20px;
-    font-size: 1rem;
-    width: 100%;
-  }
-
-  /* Minigame Mobile Overrides */
-  .tycoon-content {
-    flex-direction: column !important;
-    overflow-y: auto !important;
-  }
-
-  .tycoon-experts {
-    width: 100% !important;
-    border-right: none !important;
-    border-bottom: 2px solid #bdc3c7 !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    justify-content: space-around !important;
-  }
-
-  .tycoon-actions {
-    grid-template-columns: 1fr !important;
-  }
-
-  .tycoon-hud {
-    flex-direction: column !important;
-    height: auto !important;
-    padding: 10px !important;
-    gap: 10px !important;
-  }
-
-  .aquifer-scores {
-    flex-direction: column !important;
-    gap: 5px !important;
-    top: 5px !important;
-    width: 100% !important;
-  }
-
-  .aquifer-score-box {
-    padding: 4px 10px !important;
-    font-size: 0.8rem !important;
-  }
-
-  /* Game UI Mobile - Interactive HUD */
-  .game-header {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    overflow: hidden;
-  }
-
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-
-  .game-header h1 {
-    font-size: 1.1rem !important;
-    margin: 0;
-  }
-
-  .mobile-hud-toggle {
-    display: block !important;
-    background: #3498db;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  /* When Collapsed: Hide the Resource HUD completely and shrink header */
-  .resource-hud.collapsed {
-    transform: translateY(150%);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  /* When Expanded: Show the Resource HUD as a bottom sheet */
-  .resource-hud.expanded {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
-  .resource-hud {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    border-radius: 20px 20px 0 0 !important;
-    box-sizing: border-box;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: 20px 15px 80px 15px !important;
-    /* Extra padding at bottom for iOS home bar */
-    background: white;
-    box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.15);
-    z-index: 2000;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s ease;
-  }
-
-  .resource-hud h3 {
-    width: 100%;
-    font-size: 1rem;
-    margin-bottom: 10px;
-    text-align: center;
-  }
-
-  .resource-item {
-    flex: 1;
-    min-width: 130px;
-    margin-bottom: 15px;
-    margin-right: 15px;
-  }
-
-  .minigame-card {
-    height: 90vh;
-    overflow-y: auto;
-  }
-
-  .admin-tools {
-    display: flex;
-    flex-direction: column;
-    gap: 8px !important;
-    bottom: 20px !important;
-    left: 10px !important;
-  }
-
-  /* Speculation HUD Mobile (Collapsible) */
-  .speculation-hud.collapsed {
-    transform: translateX(150%);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .speculation-hud.expanded {
-    transform: translateX(0);
-    opacity: 1;
-    pointer-events: auto;
-  }
-
   .speculation-hud {
     position: fixed !important;
     top: 70px !important;
     right: 15px !important;
     max-width: calc(100vw - 30px) !important;
-  }
-}
-
-/* Ensure the toggle is hidden on Desktop */
-@media (min-width: 769px) {
-  .mobile-hud-toggle {
-    display: none !important;
+    width: auto !important;
   }
 
-  .game-header {
-    position: absolute;
-    top: 0;
-    left: 0;
-    padding: 1rem;
-    z-index: 1000;
-    pointer-events: none;
-  }
-
-  .header-content {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(5px);
-    padding: 10px 20px;
-    border-radius: 12px;
-    display: inline-block;
-    pointer-events: auto;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  .minigame-card {
+    height: 90vh;
+    overflow-y: auto;
   }
 }

@@ -29,7 +29,7 @@ export const NARRATIVE_PHASES = {
         video: "/cinematics/celdoni_video_2.mp4",
         dialogue: [
             { character: "Celdoni", text: "Ho sentiu? És el soroll de la gent movent-se. Però el Plater està enviant més 'Suits' cap al Pavelló." },
-            { character: "Marketing Expert", text: "Necessitem una campanya de comunicació massiva. Si el Pavelló cau, la xarxa cau." },
+            { character: "Experta en Comunicació", text: "Necessitem una campanya de comunicació massiva. Si el Pavelló cau, la xarxa cau." },
             { character: "Celdoni", text: "Llavors carregarem contra ells! Amb rodes i plaques solars! Que tremolin els falsos gegants!" }
         ]
     },

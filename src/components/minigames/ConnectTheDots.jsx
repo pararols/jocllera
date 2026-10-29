@@ -71,6 +71,19 @@ const ConnectTheDots = ({ onComplete, onClose }) => {
         setCurrentPos(null);
     };
 
+    const handleNodeClick = (index) => {
+        if (success) return;
+        if (index === completedPoints.length) {
+            const nextPoints = [...completedPoints, index];
+            setCompletedPoints(nextPoints);
+            if (index === points.length - 1) {
+                setSuccess(true);
+                setIsDragging(false);
+                setTimeout(onComplete, 800);
+            }
+        }
+    };
+
     // Render path lines
     const renderLines = () => {
         const lines = [];
@@ -131,6 +144,14 @@ const ConnectTheDots = ({ onComplete, onClose }) => {
                         onTouchMove={handleMove}
                         onTouchEnd={handleEnd}
                     >
+                        {/* Línies guia de fons per marcar el recorregut */}
+                        {!success && (
+                            <>
+                                <line x1="50%" y1="20%" x2="50%" y2="50%" stroke="rgba(255,255,255,0.12)" strokeWidth="3" strokeDasharray="6,6" />
+                                <line x1="50%" y1="50%" x2="50%" y2="80%" stroke="rgba(255,255,255,0.12)" strokeWidth="3" strokeDasharray="6,6" />
+                            </>
+                        )}
+
                         {renderLines()}
 
                         {points.map((p, index) => {
@@ -138,20 +159,20 @@ const ConnectTheDots = ({ onComplete, onClose }) => {
                             const isNext = index === completedPoints.length;
 
                             return (
-                                <g key={p.id}>
+                                <g key={p.id} onClick={() => handleNodeClick(index)} style={{ cursor: isNext ? 'pointer' : 'default' }}>
                                     <circle
                                         cx={`${p.x}%`} cy={`${p.y}%`}
-                                        r="6"
+                                        r="12"
                                         fill={isCompleted ? "#2ecc71" : isNext ? "#f1c40f" : "#95a5a6"}
-                                        stroke="white" strokeWidth="2"
+                                        stroke="white" strokeWidth="2.5"
                                         className={isNext && !success ? "pulsing-node" : ""}
                                     />
-                                    <foreignObject x={`${p.x - 10}%`} y={`${p.y - 12}%`} width="20%" height="24%">
+                                    <foreignObject x={`${p.x - 10}%`} y={`${p.y - 12}%`} width="20%" height="24%" style={{ pointerEvents: 'none' }}>
                                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                             {p.icon}
                                         </div>
                                     </foreignObject>
-                                    <text x={`${p.x + 15}%`} y={`${p.y + 2}%`} fill="white" fontSize="12" fontWeight="bold">{p.label}</text>
+                                    <text x={`${p.x + 15}%`} y={`${p.y + 2}%`} fill="white" fontSize="13" fontWeight="bold" style={{ userSelect: 'none' }}>{p.label}</text>
                                 </g>
                             );
                         })}

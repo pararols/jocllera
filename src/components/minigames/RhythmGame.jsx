@@ -30,7 +30,7 @@ const RhythmGame = ({ onComplete, onClose }) => {
             // Loop / Miss Condition
             if (next < 0.5) {
                 // Missed the beat (too late)
-                handleMiss();
+                setTimeout(() => handleMiss(), 0);
                 return 2.0; // Reset
             }
             return next;
@@ -48,7 +48,7 @@ const RhythmGame = ({ onComplete, onClose }) => {
 
     const handleMiss = () => {
         setCombo(0);
-        setFeedback({ text: 'MISS', color: '#e74c3c' });
+        setFeedback({ text: 'FALLADA', color: '#e74c3c' });
         setTimeout(() => setFeedback(null), 500);
         // Maybe penalty?
     };
@@ -65,7 +65,7 @@ const RhythmGame = ({ onComplete, onClose }) => {
             setScore(newScore);
             setCombo(c => c + 1);
             setFeedback({
-                text: isPerfect ? 'PERFECT!' : 'GOOD!',
+                text: isPerfect ? 'PERFECTE!' : 'BÉ!',
                 color: isPerfect ? '#f1c40f' : '#2ecc71'
             });
 

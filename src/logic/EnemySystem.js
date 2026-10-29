@@ -1,18 +1,16 @@
-
 // Logic for Enemy Spawning and Movement
 
 export const EnemySystem = {
-    // Spawn an enemy at a random edge of the current view or map bounds
+    // Spawn an enemy near the village approaching a target installation
     spawnEnemy: (id, mapBounds, targetNodes) => {
         if (!targetNodes || targetNodes.length === 0) return null;
 
-        // Pick a random target from liberated nodes
+        // Pick a random target
         const target = targetNodes[Math.floor(Math.random() * targetNodes.length)];
 
-        // Spawn at a random edge relative to the target (simplification)
-        // Ideally, we use map bounds, but for now, let's spawn 500-800m away from target
+        // Spawn 120m - 250m away from the target so they are VISIBLE in the village viewport
         const angle = Math.random() * Math.PI * 2;
-        const distance = 0.005 + Math.random() * 0.002; // Approx 500m in lat/lng degrees (very rough)
+        const distance = 0.0012 + Math.random() * 0.0015; // ~130m to 280m in lat/lng degrees
 
         const startLat = target.lat + Math.sin(angle) * distance;
         const startLng = target.lng + Math.cos(angle) * distance;
@@ -24,8 +22,9 @@ export const EnemySystem = {
             targetId: target.id,
             targetLat: target.lat,
             targetLng: target.lng,
-            speed: 0.00003, // Speed per tick
-            type: 'suit' // Type of enemy
+            speed: 0.000045, // Visible, smooth walking speed (~5m/s)
+            type: 'suit',
+            pressure: 0 // Pressure meter once they reach the target
         };
     },
 
@@ -36,9 +35,15 @@ export const EnemySystem = {
             const dy = enemy.targetLng - enemy.lng;
             const distance = Math.sqrt(dx * dx + dy * dy);
 
-            if (distance < 0.0001) {
-                // Reached target!
-                return { ...enemy, reachedTarget: true };
+            if (distance < 0.00015 || enemy.reachedTarget || enemy.isAttacking) {
+                // Reached target or actively attacking!
+                return {
+                    ...enemy,
+                    reachedTarget: true,
+                    isAttacking: true,
+                    lat: enemy.targetLat,
+                    lng: enemy.targetLng
+                };
             }
 
             // Normalize and move

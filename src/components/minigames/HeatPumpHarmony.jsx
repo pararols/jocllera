@@ -203,7 +203,7 @@ const HeatPumpHarmony = ({ onComplete, onClose, onImpact }) => {
             s.score += isPerfect ? 2 : 1;
             setScore(s.score);
             setCombo(c => c + 1);
-            setFeedback({ text: isPerfect ? 'PERFECT!' : 'GOOD!', color: isPerfect ? '#f1c40f' : '#2ecc71' });
+            setFeedback({ text: isPerfect ? 'PERFECTE!' : 'BÉ!', color: isPerfect ? '#f1c40f' : '#2ecc71' });
 
             if (s.score >= REQUIRED_SCORE) {
                 setGameState('success');

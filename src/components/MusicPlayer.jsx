@@ -1,26 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Volume2, VolumeX, Music } from 'lucide-react';
+import SoundManager from '../logic/SoundManager';
 
 const MusicPlayer = ({ phase }) => {
     const [muted, setMuted] = useState(true); // Start muted to avoid autoplay blocks
-    const audioRef = useRef(null);
-    const audioPath = "/assets/Digital_Overdrive.mp3";
 
     useEffect(() => {
-        if (audioRef.current) {
-            audioRef.current.volume = 0.3;
-            if (!muted) {
-                const playPromise = audioRef.current.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(error => {
-                        console.log("Audio play failed (autoplay block?):", error);
-                        setMuted(true);
-                    });
-                }
-            } else {
-                audioRef.current.pause();
-            }
-        }
+        SoundManager.setMute(muted);
     }, [muted]);
 
     const handleToggle = (e) => {
@@ -38,14 +24,6 @@ const MusicPlayer = ({ phase }) => {
             transition: 'all 0.3s ease',
             pointerEvents: 'auto'
         }}>
-            <audio
-                ref={audioRef}
-                src={audioPath}
-                loop
-                preload="auto"
-                onError={(e) => console.error("Audio Load Error:", e)}
-            />
-
             <button
                 onClick={handleToggle}
                 style={{

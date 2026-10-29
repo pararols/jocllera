@@ -530,12 +530,9 @@ const MobileGameMap = ({
                                 zIndexOffset={zIndex}
                                 eventHandlers={{
                                     click: (e) => {
-                                        if (attackingEnemy && onEnemyClick) {
-                                            onEnemyClick(attackingEnemy.id);
+                                        if (e.originalEvent) {
+                                            e.originalEvent.stopPropagation();
                                         }
-                                        handleNodeTap(inst, e);
-                                    },
-                                    mousedown: (e) => {
                                         if (attackingEnemy && onEnemyClick) {
                                             onEnemyClick(attackingEnemy.id);
                                         }
@@ -632,10 +629,6 @@ const MobileGameMap = ({
                                 zIndexOffset={9999}
                                 eventHandlers={{
                                     click: (e) => {
-                                        L.DomEvent.stopPropagation(e);
-                                        if (onEnemyClick) onEnemyClick(enemy.id);
-                                    },
-                                    mousedown: (e) => {
                                         L.DomEvent.stopPropagation(e);
                                         if (onEnemyClick) onEnemyClick(enemy.id);
                                     }

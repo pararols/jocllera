@@ -7,11 +7,11 @@ const CinematicOverlay = ({ phase, onComplete }) => {
     if (!phase) return null;
 
     const handleNext = () => {
-        if (step < phase.dialogue.length - 1) {
-            setStep(s => s + 1);
-        } else {
+        if (!phase.dialogue || step >= phase.dialogue.length - 1) {
             onComplete();
+            return;
         }
+        setStep(s => Math.min(phase.dialogue.length - 1, s + 1));
     };
 
     if (phase.video) {
@@ -76,7 +76,7 @@ const CinematicOverlay = ({ phase, onComplete }) => {
         );
     }
 
-    const currentLine = phase.dialogue[step];
+    const currentLine = (phase.dialogue && phase.dialogue[Math.min(step, phase.dialogue.length - 1)]) || { character: '', text: '' };
 
     return (
         <div style={{

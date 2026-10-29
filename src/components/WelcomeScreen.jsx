@@ -43,20 +43,18 @@ const WelcomeScreen = ({ onStart, onReset, savedProgressCount = 0 }) => {
         }
     ];
 
-    const currentStep = steps[step];
+    const currentStep = steps[Math.min(step, steps.length - 1)] || steps[0];
 
     const handleNext = () => {
-        if (step < steps.length - 1) {
-            setStep(s => s + 1);
-        } else {
+        if (step >= steps.length - 1) {
             onStart();
+            return;
         }
+        setStep(s => Math.min(steps.length - 1, s + 1));
     };
 
     const handlePrev = () => {
-        if (step > 0) {
-            setStep(s => s - 1);
-        }
+        setStep(s => Math.max(0, s - 1));
     };
 
     return (

@@ -296,13 +296,13 @@ const MobileApp = (props) => {
                 <div className="modal-overlay" style={{ padding: '16px', zIndex: 100000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <div className="modal-content victory" style={{ width: '100%', maxWidth: '420px', maxHeight: '90vh', overflowY: 'auto', textAlign: 'center', padding: '20px', borderRadius: '20px', border: '2px solid rgba(16, 185, 129, 0.6)' }}>
                         <video
-                            src="/cinematics/celdoni_video_victory.mp4"
+                            src="/cinematics/ffinal.mp4"
                             poster="/cinematics/celdoni_victory_epic.png"
                             autoPlay
                             loop
-                            muted
+                            controls
                             playsInline
-                            style={{ width: '100%', maxHeight: '160px', objectFit: 'cover', borderRadius: '14px', marginBottom: '12px', border: '1px solid rgba(16, 185, 129, 0.4)' }}
+                            style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '14px', marginBottom: '12px', border: '1px solid rgba(16, 185, 129, 0.4)' }}
                         />
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#10b981', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase' }}>
                             🏆 Victòria Comunitària Total

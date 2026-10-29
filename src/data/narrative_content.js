@@ -15,7 +15,7 @@ export const NARRATIVE_PHASES = {
         title: "L'Assemblea a la Sala Nova",
         description: "La primera espurna d'unió. Reuneix la gent a la Sala Nova.",
         threshold: 3, // nodes liberated
-        video: "/cinematics/celdoni_video_phase1.mp4",
+        video: "/cinematics/f1.mp4",
         dialogue: [
             { character: "Antònia", text: "Ja en som uns quants! Els veïns estan començant a veure que l'especulació ens roba el futur." },
             { character: "Celdoni", text: "Amb aquest cop de llança, cada kW que generem nosaltres és un euro que no va a les butxaques dels especuladors." },
@@ -37,7 +37,7 @@ export const NARRATIVE_PHASES = {
         title: "L'Hora dels Gegants",
         description: "El territori està despert. La batalla final s'apropa.",
         threshold: 20,
-        video: "/cinematics/celdoni_video_phase3.mp4",
+        video: "/cinematics/f3.mp4",
         dialogue: [
             { character: "Antònia", text: "Mai havíem estat tan units. Mira el color que torna als camps!" },
             { character: "Celdoni", text: "El Plater està desesperat. Estan plegant les rases d'amagat. No podem aturar la càrrega ara. Falta poc!" }

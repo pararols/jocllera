@@ -893,13 +893,13 @@ function App() {
             boxShadow: '0 20px 60px rgba(16, 185, 129, 0.35), 0 0 40px rgba(0, 0, 0, 0.8)'
           }}>
             <video
-              src="/cinematics/celdoni_video_victory.mp4"
+              src="/cinematics/ffinal.mp4"
               poster="/cinematics/celdoni_victory_epic.png"
               autoPlay
               loop
-              muted
+              controls
               playsInline
-              style={{ width: '100%', maxHeight: '240px', objectFit: 'cover', borderRadius: '16px', marginBottom: '1.2rem', boxShadow: '0 8px 24px rgba(0,0,0,0.5)', border: '1px solid rgba(16, 185, 129, 0.4)' }}
+              style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '16px', marginBottom: '1.2rem', boxShadow: '0 8px 24px rgba(0,0,0,0.5)', border: '1px solid rgba(16, 185, 129, 0.4)' }}
             />
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '20px', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#10b981', fontWeight: 800, fontSize: '0.85rem', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
               🏆 Victòria Comunitària Total

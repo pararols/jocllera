@@ -383,7 +383,7 @@ const MobileGameMap = ({
 
         // If an enemy is currently attacking this rooftop, expelling the enemy happens IMMEDIATELY,
         // and we STILL proceed to launch the minigame!
-        const attackingEnemy = enemies?.find(en => en.targetId === inst.id && (en.isAttacking || en.reachedTarget));
+        const attackingEnemy = corruptionLevel > 0 ? enemies?.find(en => en.targetId === inst.id && (en.isAttacking || en.reachedTarget)) : null;
         if (attackingEnemy && onEnemyClick) {
             onEnemyClick(attackingEnemy.id);
         }
@@ -520,7 +520,7 @@ const MobileGameMap = ({
                             markerIcon = pendingRooftopIcon(currentPower, inst.id);
                         }
 
-                        const attackingEnemy = enemies?.find(en => en.targetId === inst.id && (en.isAttacking || en.reachedTarget));
+                        const attackingEnemy = corruptionLevel > 0 ? enemies?.find(en => en.targetId === inst.id && (en.isAttacking || en.reachedTarget)) : null;
 
                         return (
                             <Marker
@@ -608,7 +608,7 @@ const MobileGameMap = ({
                     })}
 
                     {/* Enemies (Homes de negre) */}
-                    {enemies && enemies.map((enemy) => (
+                    {corruptionLevel > 0 && enemies && enemies.map((enemy) => (
                         <React.Fragment key={`mobile-enemy-frag-${enemy.id}`}>
                             {enemy.isAttacking && (
                                 <Circle

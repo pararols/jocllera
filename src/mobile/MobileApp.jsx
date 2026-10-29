@@ -95,9 +95,37 @@ const MobileApp = (props) => {
 
             {/* MISSION SUB-BAR */}
             {currentMission && (
-                <div style={{ backgroundColor: '#0f172a', color: '#e2e8f0', padding: '6px 14px', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '6px', zIndex: 9 }}>
-                    <Compass size={14} color="#38bdf8" style={{ flexShrink: 0 }} />
-                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currentMission}</span>
+                <div
+                    onClick={() => {
+                        if (canAturarPlater && !activeMiniGame) {
+                            setActiveMiniGame('aturemPlater');
+                        }
+                    }}
+                    style={{
+                        backgroundColor: canAturarPlater ? '#064e3b' : '#0f172a',
+                        borderBottom: canAturarPlater ? '1.5px solid #10b981' : 'none',
+                        color: canAturarPlater ? '#a7f3d0' : '#e2e8f0',
+                        padding: '6px 14px',
+                        fontSize: '0.78rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: '6px',
+                        zIndex: 1050,
+                        cursor: canAturarPlater ? 'pointer' : 'default'
+                    }}
+                >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', overflow: 'hidden' }}>
+                        <Compass size={14} color={canAturarPlater ? '#34d399' : '#38bdf8'} style={{ flexShrink: 0 }} />
+                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: canAturarPlater ? 700 : 400 }}>
+                            {currentMission}
+                        </span>
+                    </div>
+                    {canAturarPlater && (
+                        <span style={{ fontSize: '0.7rem', fontWeight: 900, backgroundColor: '#10b981', color: '#ffffff', padding: '2px 8px', borderRadius: '10px', flexShrink: 0, textTransform: 'uppercase' }}>
+                            Jugar ➔
+                        </span>
+                    )}
                 </div>
             )}
 
@@ -227,20 +255,41 @@ const MobileApp = (props) => {
                 )}
             </main>
 
-            {/* FINAL PHASE BUTTON */}
+            {/* FINAL PHASE BUTTON - ALWAYS VISIBLE DIRECTLY OVER THE MAP */}
             {canAturarPlater && !activeMiniGame && (
-                <div style={{ position: 'absolute', bottom: '75px', left: '0', right: '0', padding: '0 16px', zIndex: 100 }}>
+                <div style={{
+                    position: 'fixed',
+                    bottom: '72px',
+                    left: '12px',
+                    right: '72px',
+                    zIndex: 1150,
+                    pointerEvents: 'auto'
+                }}>
                     <button
                         onClick={() => setActiveMiniGame('aturemPlater')}
                         style={{
-                            width: '100%', padding: '14px', fontSize: '1.15rem', fontWeight: 'bold',
+                            width: '100%',
+                            padding: '12px 14px',
+                            fontSize: '1.02rem',
+                            fontWeight: 900,
+                            letterSpacing: '0.5px',
                             background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                            color: 'white', border: 'none', borderRadius: '12px',
-                            boxShadow: '0 4px 14px rgba(16, 185, 129, 0.45)',
-                            cursor: 'pointer'
+                            color: 'white',
+                            border: '2px solid #6ee7b7',
+                            borderRadius: '14px',
+                            boxShadow: '0 6px 20px rgba(16, 185, 129, 0.6), 0 0 12px rgba(16, 185, 129, 0.4)',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px',
+                            animation: 'pulseGreen 2s infinite alternate',
+                            outline: 'none',
+                            touchAction: 'manipulation'
                         }}
                     >
-                        🏁 ATUREM EL PLATER!
+                        <span style={{ fontSize: '1.25rem' }}>🏁</span>
+                        <span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>ATUREM EL PLATER!</span>
                     </button>
                 </div>
             )}
@@ -415,6 +464,13 @@ const MobileApp = (props) => {
                 isOpen={showRules}
                 onClose={() => setShowRules(false)}
             />
+
+            <style>{`
+                @keyframes pulseGreen {
+                    0% { transform: scale(1); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45); }
+                    100% { transform: scale(1.025); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.8), 0 0 15px rgba(16, 185, 129, 0.5); }
+                }
+            `}</style>
         </div>
     );
 };

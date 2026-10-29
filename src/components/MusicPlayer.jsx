@@ -23,9 +23,9 @@ const MusicPlayer = ({ phase, isMobile = false, canAturarPlater = false }) => {
             <div
                 style={{
                     position: 'fixed',
-                    bottom: canAturarPlater ? '142px' : '76px',
+                    bottom: '72px',
                     right: '16px',
-                    zIndex: 1000,
+                    zIndex: 1150,
                     transition: 'bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     pointerEvents: 'auto'
                 }}

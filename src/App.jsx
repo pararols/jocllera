@@ -200,7 +200,10 @@ function App() {
   const handleImpact = (value) => setCo2Bonus(prev => prev + value);
   const handlePenalty = (value) => setSpeculationPenalty(prev => prev + value);
 
-  const corruptionLevel = Math.max(0, Math.min(100, (100 - (liberatedRooftopsCount * (80 / totalRooftopNodes))) + speculationPenalty - speculationReduction));
+  const corruptionLevel = allRooftopsLiberated
+    ? 0
+    : Math.max(0, Math.min(100, (100 - (liberatedRooftopsCount * (80 / totalRooftopNodes))) + speculationPenalty - speculationReduction));
+  const isThreatNeutralized = allRooftopsLiberated || corruptionLevel <= 0;
 
   const [activeMiniGame, setActiveMiniGame] = useState(null);
   const [pendingNode, setPendingNode] = useState(null);
@@ -255,38 +258,41 @@ function App() {
     setSeenPhases(new Set([0]));
   };
 
-  // CELEBRACIÓ I EXPULSIÓ DELS HOMES DE NEGRE QUAN S'ALLIBEREN TOTES LES TEULADES
-  const prevAllLiberatedRef = useRef(false);
+  // CELEBRACIÓ I EXPULSIÓ DELS HOMES DE NEGRE QUAN S'ALLIBEREN TOTES LES TEULADES O AMENAÇA = 0
+  const prevThreatNeutralizedRef = useRef(false);
   useEffect(() => {
-    if (allRooftopsLiberated) {
+    if (isThreatNeutralized) {
       setEnemies([]);
-      if (!prevAllLiberatedRef.current) {
-        prevAllLiberatedRef.current = true;
+      if (!prevThreatNeutralizedRef.current) {
+        prevThreatNeutralizedRef.current = true;
         SoundManager.playSFX('victory');
         setContagionToast({
-          message: "🎉 TOTES LES TEULADES ALLIBERADES! Els Homes de Negre han estat definitivament expulsats de Sant Jordi Desvalls!",
+          message: "🎉 AMENAÇA NEUTRALITZADA! Els Homes de Negre han estat definitivament expulsats de Sant Jordi Desvalls!",
           id: Date.now()
         });
       }
     } else {
-      prevAllLiberatedRef.current = false;
+      prevThreatNeutralizedRef.current = false;
     }
-  }, [allRooftopsLiberated]);
+  }, [isThreatNeutralized]);
 
   // ENEMY LOOP (HOMES DE NEGRE)
   useEffect(() => {
-    // Si s'han alliberat totes les teulades, atura completament els homes de negre i neteja el mapa
-    if (allRooftopsLiberated) {
+    // Si s'han alliberat totes les teulades o l'amenaça és 0, atura completament els homes de negre i neteja el mapa
+    if (isThreatNeutralized) {
       setEnemies([]);
       return;
     }
 
     const interval = setInterval(() => {
-      // Pause enemy sabotage and attack loop while playing a minigame, cinematic, in Map Editor Mode, or when all rooftops are liberated
-      if (activeMiniGame || showCinematic || showEditor || allRooftopsLiberated) return;
+      // Pause enemy sabotage and attack loop while playing a minigame, cinematic, in Map Editor Mode, or when threat is neutralized
+      if (activeMiniGame || showCinematic || showEditor || isThreatNeutralized) {
+        setEnemies([]);
+        return;
+      }
 
       setEnemies(prevEnemies => {
-        if (allRooftopsLiberated) return [];
+        if (isThreatNeutralized) return [];
         let newEnemies = EnemySystem.moveEnemies(prevEnemies);
         let newlyConqueredNodes = new Set();
 
@@ -389,8 +395,8 @@ function App() {
         }
 
         // Target ONLY liberated rooftops (user requirement: "els homes de negre han d'anar a les teulades alliberades")
-        // Quan totes les teulades estan alliberades, no es generen nous enemics
-        if (allRooftopsLiberated) return [];
+        // Quan totes les teulades estan alliberades o l'amenaça és 0, no es generen nous enemics
+        if (isThreatNeutralized) return [];
         const candidateTargets = gisData.installations.filter(i => liberatedNodes.has(i.id) && i.type === 'rooftop');
 
         // Only spawn enemies if there are liberated rooftops to target
@@ -414,7 +420,7 @@ function App() {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [liberatedNodes, activeMiniGame, showCinematic, gamePhase, showEditor, allRooftopsLiberated]);
+  }, [liberatedNodes, activeMiniGame, showCinematic, gamePhase, showEditor, isThreatNeutralized]);
 
   const handleEnemyClick = (enemyId) => {
     setEnemies(prev => {

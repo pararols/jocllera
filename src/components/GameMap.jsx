@@ -364,7 +364,7 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
     const handleLiberateAttempt = (inst, latlng, containerPoint) => {
         // If an enemy is currently attacking this rooftop, expelling the enemy happens IMMEDIATELY,
         // and we STILL proceed to launch the minigame so the user can play or defend!
-        const attackingEnemy = enemies?.find(e => e.targetId === inst.id && (e.isAttacking || e.reachedTarget));
+        const attackingEnemy = corruptionLevel > 0 ? enemies?.find(e => e.targetId === inst.id && (e.isAttacking || e.reachedTarget)) : null;
         if (attackingEnemy && onEnemyClick) {
             onEnemyClick(attackingEnemy.id);
         }
@@ -520,7 +520,7 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                         markerIcon = pendingRooftopIcon(currentPower, inst.id);
                     }
 
-                    const attackingEnemy = enemies?.find(en => en.targetId === inst.id && (en.isAttacking || en.reachedTarget));
+                    const attackingEnemy = corruptionLevel > 0 ? enemies?.find(en => en.targetId === inst.id && (en.isAttacking || en.reachedTarget)) : null;
 
                     return (
                         <Marker
@@ -621,7 +621,7 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                 })}
 
                 {/* ENEMIES (The Suits / Homes de negre) */}
-                {!isEditorMode && enemies && enemies.map((enemy) => (
+                {!isEditorMode && corruptionLevel > 0 && enemies && enemies.map((enemy) => (
                     <React.Fragment key={`enemy-frag-${enemy.id}`}>
                         {enemy.isAttacking && (
                             <Circle

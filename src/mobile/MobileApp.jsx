@@ -410,7 +410,15 @@ const MobileApp = (props) => {
                                 🗺️ Explorar el Municipi en Pau
                             </button>
                             <button
-                                onClick={onResetGame}
+                                onClick={() => {
+                                    setShowVictoryModal(false);
+                                    if (onResetGame) {
+                                        onResetGame();
+                                    } else {
+                                        localStorage.clear();
+                                        window.location.reload();
+                                    }
+                                }}
                                 style={{
                                     width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)',
                                     backgroundColor: 'transparent', color: '#cbd5e1', fontWeight: '600', fontSize: '0.85rem',

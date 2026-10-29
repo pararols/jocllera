@@ -238,10 +238,24 @@ function App() {
   };
 
   const handleResetGame = () => {
-    localStorage.clear();
+    try {
+      localStorage.removeItem('llera_liberatedNodes');
+      localStorage.removeItem('llera_clearedBads');
+      localStorage.removeItem('llera_seenPhases');
+      localStorage.removeItem('llera_co2Bonus');
+      localStorage.removeItem('llera_speculationPenalty');
+      localStorage.removeItem('llera_speculationReduction');
+      localStorage.removeItem('llera_gamePhase');
+      localStorage.removeItem('llera_nodePowers');
+    } catch (e) {
+      console.error('Error clearing game localStorage:', e);
+    }
+    setShowVictoryModal(false);
+    setActiveMiniGame(null);
+    setPendingNode(null);
     setLiberatedNodes(new Set());
     setClearedBads(new Set());
-    setSeenPhases(new Set());
+    setSeenPhases(new Set([0]));
     setCo2Bonus(0);
     setSpeculationPenalty(0);
     setSpeculationReduction(0);
@@ -253,9 +267,9 @@ function App() {
     nodePowersRef.current = initial;
     setGamePhase(0);
     setEnemies([]);
-    setShowStartModal(false);
-    setShowCinematic(true);
-    setSeenPhases(new Set([0]));
+    setShowStartModal(true);
+    setShowCinematic(false);
+    window.location.reload();
   };
 
   // CELEBRACIÓ I EXPULSIÓ DELS HOMES DE NEGRE QUAN S'ALLIBEREN TOTES LES TEULADES O AMENAÇA = 0
@@ -969,8 +983,11 @@ function App() {
               </button>
               <button
                 className="btn btn-secondary"
-                onClick={handleResetGame}
-                style={{ padding: '14px 24px', fontSize: '1rem', color: '#cbd5e1' }}
+                onClick={() => {
+                  setShowVictoryModal(false);
+                  handleResetGame();
+                }}
+                style={{ padding: '14px 24px', fontSize: '1rem', color: '#cbd5e1', cursor: 'pointer' }}
               >
                 🔄 Tornar a Jugar de Zero
               </button>

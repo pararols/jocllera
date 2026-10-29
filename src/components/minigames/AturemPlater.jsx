@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { 
     Shield, CheckCircle, RotateCcw, Layers, Eye, EyeOff, 
-    Plus, Minus, Compass, Hand, Paintbrush 
+    Plus, Minus, Compass, Hand, Paintbrush,
+    ChevronUp, ChevronDown, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -24,6 +25,9 @@ const MapController = ({ bounds, center, onMapReady, onMapUpdate }) => {
 
     useEffect(() => {
         if (!map) return;
+
+        map.dragging?.enable();
+        map.touchZoom?.enable();
 
         if (bounds) {
             map.fitBounds(bounds, { padding: [35, 35], maxZoom: 16, animate: false });
@@ -86,6 +90,31 @@ const AturemPlater = ({ onComplete, onClose }) => {
     const mapCenterRef = useRef(gisData.center || [42.0719, 2.9569]);
     const toastTimerRef = useRef(null);
     const lastWheelTimeRef = useRef(0);
+    const isPanningRef = useRef(false);
+    const panStartRef = useRef({ x: 0, y: 0 });
+    const touchDistRef = useRef(null);
+    const touchMidRef = useRef(null);
+    const isSpaceDownRef = useRef(false);
+
+    // Suport de tecla espai per fer pan com a Figma/Photoshop
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.code === 'Space' && !e.repeat && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                isSpaceDownRef.current = true;
+            }
+        };
+        const handleKeyUp = (e) => {
+            if (e.code === 'Space') {
+                isSpaceDownRef.current = false;
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keyup', handleKeyUp);
+        };
+    }, []);
 
     // Mides del contenidor
     useEffect(() => {
@@ -458,9 +487,28 @@ const AturemPlater = ({ onComplete, onClose }) => {
         }
     }, [brushSize, latLngToOffscreen, renderCoverToScreen, selectedTool, showMismatchFeedback]);
 
-    // Gestió d'esdeveniments del ratolí i tàctils
+    // Funció de desplaçament (Pan) manual i amb botons
+    const handlePan = (dx, dy) => {
+        const map = mapInstanceRef.current;
+        if (!map) return;
+        map.panBy([dx, dy], { animate: true, duration: 0.25 });
+    };
+
+    // Gestió d'esdeveniments del ratolí (click premut desplaçar a web)
     const handlePointerDown = (e) => {
-        if (interactionMode !== 'paint') return;
+        const isRightClick = e.button === 2;
+        const isMiddleClick = e.button === 1;
+        const isPanMode = interactionMode === 'pan';
+
+        // Si és mode Moure o s'utilitza botó dret/central/espai, activar Pan amb ratolí
+        if (isPanMode || isRightClick || isMiddleClick || isSpaceDownRef.current) {
+            isPanningRef.current = true;
+            panStartRef.current = { x: e.clientX, y: e.clientY };
+            return;
+        }
+
+        if (e.button !== 0) return; // Només clic esquerre per pintar
+
         const rect = coverCanvasRef.current.getBoundingClientRect();
         const pt = { x: e.clientX - rect.left, y: e.clientY - rect.top };
         setIsDrawing(true);
@@ -470,6 +518,18 @@ const AturemPlater = ({ onComplete, onClose }) => {
     };
 
     const handlePointerMove = (e) => {
+        // Desplaçament continu del mapa amb clic premut
+        if (isPanningRef.current) {
+            const dx = e.clientX - panStartRef.current.x;
+            const dy = e.clientY - panStartRef.current.y;
+            panStartRef.current = { x: e.clientX, y: e.clientY };
+            const map = mapInstanceRef.current;
+            if (map) {
+                map.panBy([-dx, -dy], { animate: false });
+            }
+            return;
+        }
+
         if (!isDrawing || !lastPos || interactionMode !== 'paint') return;
         const rect = coverCanvasRef.current.getBoundingClientRect();
         const pt = { x: e.clientX - rect.left, y: e.clientY - rect.top };
@@ -478,26 +538,127 @@ const AturemPlater = ({ onComplete, onClose }) => {
     };
 
     const handlePointerUp = () => {
+        isPanningRef.current = false;
         if (!isDrawing) return;
         setIsDrawing(false);
         setLastPos(null);
         calculateRecoveryProgress();
     };
 
-    // Suport de zoom amb la rodeta del ratolí sobre el canvas de pintura
+    // Gestió d'esdeveniments tàctils amb els dits (1 dit pinta o mou, 2 dits mouen i fan zoom)
+    const handleTouchStart = (e) => {
+        if (e.touches.length === 2) {
+            setIsDrawing(false);
+            setLastPos(null);
+            isPanningRef.current = true;
+            const t1 = e.touches[0];
+            const t2 = e.touches[1];
+            touchDistRef.current = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+            touchMidRef.current = {
+                x: (t1.clientX + t2.clientX) / 2,
+                y: (t1.clientY + t2.clientY) / 2
+            };
+            return;
+        }
+
+        if (interactionMode === 'pan') {
+            isPanningRef.current = true;
+            panStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            return;
+        }
+
+        if (interactionMode === 'paint' && e.touches.length === 1) {
+            const rect = coverCanvasRef.current.getBoundingClientRect();
+            const pt = { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+            setIsDrawing(true);
+            setLastPos(pt);
+            paintStroke(pt, pt);
+            SoundManager.playSFX('click');
+        }
+    };
+
+    const handleTouchMove = (e) => {
+        // Gestió de 2 dits a mòbil: desplaçar i pessic per fer zoom simultani
+        if (e.touches.length === 2) {
+            const t1 = e.touches[0];
+            const t2 = e.touches[1];
+            const curDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+            const curMid = {
+                x: (t1.clientX + t2.clientX) / 2,
+                y: (t1.clientY + t2.clientY) / 2
+            };
+
+            const map = mapInstanceRef.current;
+            if (!map) return;
+
+            if (touchMidRef.current) {
+                const dx = curMid.x - touchMidRef.current.x;
+                const dy = curMid.y - touchMidRef.current.y;
+                map.panBy([-dx, -dy], { animate: false });
+            }
+            touchMidRef.current = curMid;
+
+            if (touchDistRef.current) {
+                const distDiff = curDist - touchDistRef.current;
+                if (distDiff > 35) {
+                    map.zoomIn(1);
+                    touchDistRef.current = curDist;
+                } else if (distDiff < -35) {
+                    map.zoomOut(1);
+                    touchDistRef.current = curDist;
+                }
+            }
+            return;
+        }
+
+        // Gestió d'1 dit en mode Moure
+        if (isPanningRef.current && e.touches.length === 1) {
+            const dx = e.touches[0].clientX - panStartRef.current.x;
+            const dy = e.touches[0].clientY - panStartRef.current.y;
+            panStartRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            const map = mapInstanceRef.current;
+            if (map) {
+                map.panBy([-dx, -dy], { animate: false });
+            }
+            return;
+        }
+
+        if (!isDrawing || !lastPos || interactionMode !== 'paint') return;
+        const rect = coverCanvasRef.current.getBoundingClientRect();
+        const pt = { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+        paintStroke(lastPos, pt);
+        setLastPos(pt);
+    };
+
+    const handleTouchEnd = () => {
+        touchDistRef.current = null;
+        touchMidRef.current = null;
+        isPanningRef.current = false;
+        if (!isDrawing) return;
+        setIsDrawing(false);
+        setLastPos(null);
+        calculateRecoveryProgress();
+    };
+
+    // Suport de zoom amb la rodeta del ratolí sobre el canvas de pintura centrat al cursor
     const handleCanvasWheel = (e) => {
         e.preventDefault();
         const now = Date.now();
-        if (now - lastWheelTimeRef.current < 180) return;
+        if (now - lastWheelTimeRef.current < 90) return;
         lastWheelTimeRef.current = now;
 
         const map = mapInstanceRef.current;
         if (!map) return;
 
-        if (e.deltaY < 0) {
-            map.zoomIn(1);
-        } else if (e.deltaY > 0) {
-            map.zoomOut(1);
+        const rect = coverCanvasRef.current?.getBoundingClientRect();
+        const mousePt = rect ? [e.clientX - rect.left, e.clientY - rect.top] : [dimensions.width / 2, dimensions.height / 2];
+        const mouseLatLng = map.containerPointToLatLng(mousePt);
+
+        const zoomDelta = e.deltaY < 0 ? 1 : -1;
+        const currentZ = map.getZoom();
+        const targetZoom = Math.min(20, Math.max(12, currentZ + zoomDelta));
+        if (targetZoom !== currentZ) {
+            map.setZoomAround(mouseLatLng, targetZoom);
         }
     };
 
@@ -696,7 +857,7 @@ const AturemPlater = ({ onComplete, onClose }) => {
                                 <RotateCcw size={13} /> Reiniciar polígon
                             </button>
                             <div style={{ padding: '7px 9px', background: 'rgba(0,0,0,0.3)', borderRadius: '6px', fontSize: '0.7rem', color: '#94a3b8', lineHeight: 1.35, border: '1px solid rgba(255,255,255,0.05)' }}>
-                                💡 <strong>Zoom i navegació:</strong> Pots fer zoom amb la rodeta o els botons +/- flotants. Canvia a mode "Moure" per desplaçar el mapa.
+                                💡 <strong>Navegació i Zoom:</strong> Pots desplaçar el mapa amb els botons ⬆️⬇️⬅️➡️, canviant a mode «Moure», arrossegant amb 2 dits a mòbil, o amb botó dret / roda / tecla Espai a web. Zoom amb la rodeta del ratolí o els botons +/-.
                             </div>
                         </div>
                     </div>
@@ -741,7 +902,7 @@ const AturemPlater = ({ onComplete, onClose }) => {
                             )}
                         </div>
 
-                        {/* 2. Opaque Speculative Plater Polygon Canvas (Z-Index 10) - Suporta Zoom Georeferenciat */}
+                        {/* 2. Opaque Speculative Plater Polygon Canvas (Z-Index 10) - Suporta Zoom i Pan Georeferenciats */}
                         <canvas
                             ref={coverCanvasRef}
                             width={dimensions.width}
@@ -750,12 +911,16 @@ const AturemPlater = ({ onComplete, onClose }) => {
                             onPointerMove={handlePointerMove}
                             onPointerUp={handlePointerUp}
                             onPointerLeave={handlePointerUp}
+                            onTouchStart={handleTouchStart}
+                            onTouchMove={handleTouchMove}
+                            onTouchEnd={handleTouchEnd}
                             onWheel={handleCanvasWheel}
+                            onContextMenu={(e) => e.preventDefault()}
                             style={{
                                 position: 'absolute', top: 0, left: 0, zIndex: 10,
                                 touchAction: 'none',
-                                cursor: interactionMode === 'paint' ? 'crosshair' : 'grab',
-                                pointerEvents: interactionMode === 'paint' ? 'auto' : 'none'
+                                cursor: interactionMode === 'pan' ? 'grab' : 'crosshair',
+                                pointerEvents: 'auto'
                             }}
                         />
 
@@ -838,50 +1003,77 @@ const AturemPlater = ({ onComplete, onClose }) => {
                                 </button>
                             </div>
 
-                            {/* Botons de Zoom In / Out / Centrar */}
+                            {/* Pan D-Pad & Zoom Controls */}
                             <div style={{
-                                display: 'flex', flexDirection: 'column', background: 'rgba(15, 23, 42, 0.92)',
-                                border: '1px solid rgba(255,255,255,0.2)', borderRadius: '8px',
-                                overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.4)', alignSelf: 'flex-end'
+                                background: 'rgba(15, 23, 42, 0.94)', border: '1.5px solid rgba(255,255,255,0.2)',
+                                borderRadius: '12px', padding: '6px', boxShadow: '0 6px 20px rgba(0,0,0,0.5)',
+                                display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'center', alignSelf: 'flex-end'
                             }}>
-                                <button
-                                    onClick={handleZoomIn}
-                                    style={{
-                                        width: '34px', height: '34px', border: 'none',
-                                        borderBottom: '1px solid rgba(255,255,255,0.1)',
-                                        background: 'transparent', color: '#ffffff',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        cursor: 'pointer', transition: 'background 0.15s'
-                                    }}
-                                    title="Apropar el mapa (Zoom In)"
-                                >
-                                    <Plus size={16} />
-                                </button>
-                                <button
-                                    onClick={handleZoomOut}
-                                    style={{
-                                        width: '34px', height: '34px', border: 'none',
-                                        borderBottom: '1px solid rgba(255,255,255,0.1)',
-                                        background: 'transparent', color: '#ffffff',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        cursor: 'pointer', transition: 'background 0.15s'
-                                    }}
-                                    title="Allunyar el mapa (Zoom Out)"
-                                >
-                                    <Minus size={16} />
-                                </button>
-                                <button
-                                    onClick={handleCenterMap}
-                                    style={{
-                                        width: '34px', height: '34px', border: 'none',
-                                        background: 'transparent', color: '#38bdf8',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        cursor: 'pointer', transition: 'background 0.15s'
-                                    }}
-                                    title="Tornar a centrar al municipi"
-                                >
-                                    <Compass size={16} />
-                                </button>
+                                {/* D-Pad Buttons */}
+                                <div style={{
+                                    display: 'grid', gridTemplateColumns: 'repeat(3, 28px)', gridTemplateRows: 'repeat(3, 28px)',
+                                    gap: '3px', alignItems: 'center', justifyContent: 'center'
+                                }}>
+                                    <div />
+                                    <button
+                                        onClick={() => handlePan(0, -120)}
+                                        style={{ width: '28px', height: '28px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                        title="Desplaçar amunt"
+                                    >
+                                        <ChevronUp size={18} />
+                                    </button>
+                                    <div />
+                                    <button
+                                        onClick={() => handlePan(-120, 0)}
+                                        style={{ width: '28px', height: '28px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                        title="Desplaçar esquerra"
+                                    >
+                                        <ChevronLeft size={18} />
+                                    </button>
+                                    <button
+                                        onClick={handleCenterMap}
+                                        style={{ width: '28px', height: '28px', border: 'none', background: 'rgba(56, 189, 248, 0.25)', color: '#38bdf8', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                        title="Centrar mapa"
+                                    >
+                                        <Compass size={15} />
+                                    </button>
+                                    <button
+                                        onClick={() => handlePan(120, 0)}
+                                        style={{ width: '28px', height: '28px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                        title="Desplaçar dreta"
+                                    >
+                                        <ChevronRight size={18} />
+                                    </button>
+                                    <div />
+                                    <button
+                                        onClick={() => handlePan(0, 120)}
+                                        style={{ width: '28px', height: '28px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                        title="Desplaçar avall"
+                                    >
+                                        <ChevronDown size={18} />
+                                    </button>
+                                    <div />
+                                </div>
+
+                                <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.15)' }} />
+
+                                {/* Zoom In & Out Buttons */}
+                                <div style={{ display: 'flex', gap: '4px', width: '100%', justifyContent: 'center' }}>
+                                    <button
+                                        onClick={handleZoomIn}
+                                        style={{ flex: 1, height: '28px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                        title="Apropar el mapa (Zoom In)"
+                                    >
+                                        <Plus size={16} />
+                                    </button>
+                                    <button
+                                        onClick={handleZoomOut}
+                                        style={{ flex: 1, height: '28px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                        title="Allunyar el mapa (Zoom Out)"
+                                    >
+                                        <Minus size={16} />
+                                    </button>
+                                </div>
                             </div>
 
                             {/* Indicador de Nivell de Zoom */}

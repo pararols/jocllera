@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { 
     Shield, CheckCircle, RotateCcw, Layers, Eye, EyeOff,
-    Plus, Minus, Compass, Hand, Paintbrush 
+    Plus, Minus, Compass, Hand, Paintbrush,
+    ChevronUp, ChevronDown, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -24,6 +25,9 @@ const MobileMapController = ({ bounds, center, onMapReady, onMapUpdate }) => {
 
     useEffect(() => {
         if (!map) return;
+
+        map.dragging?.enable();
+        map.touchZoom?.enable();
 
         if (bounds) {
             map.fitBounds(bounds, { padding: [20, 20], maxZoom: 16, animate: false });
@@ -85,6 +89,11 @@ const MobileAturemPlater = ({ onComplete, onClose }) => {
     const mapBoundsRef = useRef(null);
     const mapCenterRef = useRef(gisData.center || [42.0719, 2.9569]);
     const toastTimerRef = useRef(null);
+    const lastWheelTimeRef = useRef(0);
+    const isPanningRef = useRef(false);
+    const panStartRef = useRef({ x: 0, y: 0 });
+    const touchDistRef = useRef(null);
+    const touchMidRef = useRef(null);
 
     // Mides dinàmiques
     useEffect(() => {
@@ -424,8 +433,44 @@ const MobileAturemPlater = ({ onComplete, onClose }) => {
         }
     }, [brushSize, latLngToOffscreen, renderCoverToScreen, selectedTool, showMismatchFeedback]);
 
+    // Funció de desplaçament (Pan) manual i amb botons
+    const handlePan = (dx, dy) => {
+        const map = mapInstanceRef.current;
+        if (!map) return;
+        map.panBy([dx, dy], { animate: true, duration: 0.25 });
+    };
+
     const handlePointerStart = (e) => {
-        if (interactionMode !== 'paint') return;
+        // Multi-touch a mòbil (2 dits per fer pan i zoom)
+        if (e.touches && e.touches.length === 2) {
+            setIsDrawing(false);
+            setLastPos(null);
+            isPanningRef.current = true;
+            const t1 = e.touches[0];
+            const t2 = e.touches[1];
+            touchDistRef.current = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+            touchMidRef.current = {
+                x: (t1.clientX + t2.clientX) / 2,
+                y: (t1.clientY + t2.clientY) / 2
+            };
+            return;
+        }
+
+        const isRightClick = e.button === 2;
+        const isMiddleClick = e.button === 1;
+        const isPanMode = interactionMode === 'pan';
+
+        // Si és mode Moure o s'utilitza botó dret/central, activar desplaçament
+        if (isPanMode || isRightClick || isMiddleClick) {
+            isPanningRef.current = true;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            panStartRef.current = { x: clientX, y: clientY };
+            return;
+        }
+
+        if (e.button && e.button !== 0) return; // Només botó primari
+
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         const rect = coverCanvasRef.current.getBoundingClientRect();
@@ -437,6 +482,53 @@ const MobileAturemPlater = ({ onComplete, onClose }) => {
     };
 
     const handlePointerMove = (e) => {
+        // Gestió de 2 dits a mòbil: pan i pinch zoom
+        if (e.touches && e.touches.length === 2) {
+            const t1 = e.touches[0];
+            const t2 = e.touches[1];
+            const curDist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+            const curMid = {
+                x: (t1.clientX + t2.clientX) / 2,
+                y: (t1.clientY + t2.clientY) / 2
+            };
+
+            const map = mapInstanceRef.current;
+            if (!map) return;
+
+            if (touchMidRef.current) {
+                const dx = curMid.x - touchMidRef.current.x;
+                const dy = curMid.y - touchMidRef.current.y;
+                map.panBy([-dx, -dy], { animate: false });
+            }
+            touchMidRef.current = curMid;
+
+            if (touchDistRef.current) {
+                const distDiff = curDist - touchDistRef.current;
+                if (distDiff > 35) {
+                    map.zoomIn(1);
+                    touchDistRef.current = curDist;
+                } else if (distDiff < -35) {
+                    map.zoomOut(1);
+                    touchDistRef.current = curDist;
+                }
+            }
+            return;
+        }
+
+        // Pan amb 1 dit en mode Moure o arrossegament de ratolí
+        if (isPanningRef.current) {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const dx = clientX - panStartRef.current.x;
+            const dy = clientY - panStartRef.current.y;
+            panStartRef.current = { x: clientX, y: clientY };
+            const map = mapInstanceRef.current;
+            if (map) {
+                map.panBy([-dx, -dy], { animate: false });
+            }
+            return;
+        }
+
         if (!isDrawing || !lastPos || interactionMode !== 'paint') return;
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -447,10 +539,35 @@ const MobileAturemPlater = ({ onComplete, onClose }) => {
     };
 
     const handlePointerEnd = () => {
+        touchDistRef.current = null;
+        touchMidRef.current = null;
+        isPanningRef.current = false;
         if (!isDrawing) return;
         setIsDrawing(false);
         setLastPos(null);
         calculateRecoveryProgress();
+    };
+
+    // Zoom amb la rodeta del ratolí
+    const handleCanvasWheel = (e) => {
+        e.preventDefault();
+        const now = Date.now();
+        if (now - lastWheelTimeRef.current < 90) return;
+        lastWheelTimeRef.current = now;
+
+        const map = mapInstanceRef.current;
+        if (!map) return;
+
+        const rect = coverCanvasRef.current?.getBoundingClientRect();
+        const mousePt = rect ? [e.clientX - rect.left, e.clientY - rect.top] : [dimensions.width / 2, dimensions.height / 2];
+        const mouseLatLng = map.containerPointToLatLng(mousePt);
+
+        const zoomDelta = e.deltaY < 0 ? 1 : -1;
+        const currentZ = map.getZoom();
+        const targetZoom = Math.min(20, Math.max(12, currentZ + zoomDelta));
+        if (targetZoom !== currentZ) {
+            map.setZoomAround(mouseLatLng, targetZoom);
+        }
     };
 
     const handleZoomIn = () => mapInstanceRef.current?.zoomIn(1);
@@ -560,11 +677,13 @@ const MobileAturemPlater = ({ onComplete, onClose }) => {
                         onMouseDown={handlePointerStart}
                         onMouseMove={handlePointerMove}
                         onMouseUp={handlePointerEnd}
+                        onWheel={handleCanvasWheel}
+                        onContextMenu={(e) => e.preventDefault()}
                         style={{
                             position: 'absolute', top: 0, left: 0, zIndex: 10,
                             touchAction: 'none',
-                            cursor: interactionMode === 'paint' ? 'crosshair' : 'grab',
-                            pointerEvents: interactionMode === 'paint' ? 'auto' : 'none'
+                            cursor: interactionMode === 'pan' ? 'grab' : 'crosshair',
+                            pointerEvents: 'auto'
                         }}
                     />
 
@@ -608,14 +727,14 @@ const MobileAturemPlater = ({ onComplete, onClose }) => {
                         </svg>
                     )}
 
-                    {/* 4. Controls Flotants de Zoom i Mode (Mòbil) */}
+                    {/* 4. Controls Flotants de Zoom i Pan (Mòbil) */}
                     <div style={{
                         position: 'absolute', top: 10, right: 10, zIndex: 30,
-                        display: 'flex', flexDirection: 'column', gap: '5px'
+                        display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end'
                     }}>
                         <div style={{
-                            display: 'flex', background: 'rgba(15, 23, 42, 0.92)',
-                            border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px',
+                            display: 'flex', background: 'rgba(15, 23, 42, 0.94)',
+                            border: '1.5px solid rgba(255,255,255,0.2)', borderRadius: '6px',
                             overflow: 'hidden', padding: '2px'
                         }}>
                             <button
@@ -624,7 +743,7 @@ const MobileAturemPlater = ({ onComplete, onClose }) => {
                                     padding: '5px 8px', border: 'none', borderRadius: '4px',
                                     background: interactionMode === 'paint' ? '#10b981' : 'transparent',
                                     color: interactionMode === 'paint' ? '#ffffff' : '#94a3b8',
-                                    fontSize: '0.68rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3
+                                    fontSize: '0.68rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 3
                                 }}
                             >
                                 <Paintbrush size={11} /> Pintar
@@ -635,36 +754,82 @@ const MobileAturemPlater = ({ onComplete, onClose }) => {
                                     padding: '5px 8px', border: 'none', borderRadius: '4px',
                                     background: interactionMode === 'pan' ? '#38bdf8' : 'transparent',
                                     color: interactionMode === 'pan' ? '#0f172a' : '#94a3b8',
-                                    fontSize: '0.68rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: 3
+                                    fontSize: '0.68rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: 3
                                 }}
                             >
                                 <Hand size={11} /> Moure
                             </button>
                         </div>
 
+                        {/* D-Pad Pan & Zoom cluster (Mobile) */}
                         <div style={{
-                            display: 'flex', flexDirection: 'column', background: 'rgba(15, 23, 42, 0.92)',
-                            border: '1px solid rgba(255,255,255,0.2)', borderRadius: '6px',
-                            overflow: 'hidden', alignSelf: 'flex-end'
+                            background: 'rgba(15, 23, 42, 0.94)', border: '1.5px solid rgba(255,255,255,0.2)',
+                            borderRadius: '10px', padding: '5px', boxShadow: '0 4px 15px rgba(0,0,0,0.5)',
+                            display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'center'
                         }}>
-                            <button
-                                onClick={handleZoomIn}
-                                style={{ width: '30px', height: '30px', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                            >
-                                <Plus size={14} />
-                            </button>
-                            <button
-                                onClick={handleZoomOut}
-                                style={{ width: '30px', height: '30px', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'transparent', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                            >
-                                <Minus size={14} />
-                            </button>
-                            <button
-                                onClick={handleCenterMap}
-                                style={{ width: '30px', height: '30px', border: 'none', background: 'transparent', color: '#38bdf8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                            >
-                                <Compass size={14} />
-                            </button>
+                            <div style={{
+                                display: 'grid', gridTemplateColumns: 'repeat(3, 24px)', gridTemplateRows: 'repeat(3, 24px)',
+                                gap: '3px', alignItems: 'center', justifyContent: 'center'
+                            }}>
+                                <div />
+                                <button
+                                    onClick={() => handlePan(0, -100)}
+                                    style={{ width: '24px', height: '24px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                    title="Desplaçar amunt"
+                                >
+                                    <ChevronUp size={16} />
+                                </button>
+                                <div />
+                                <button
+                                    onClick={() => handlePan(-100, 0)}
+                                    style={{ width: '24px', height: '24px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                    title="Desplaçar esquerra"
+                                >
+                                    <ChevronLeft size={16} />
+                                </button>
+                                <button
+                                    onClick={handleCenterMap}
+                                    style={{ width: '24px', height: '24px', border: 'none', background: 'rgba(56, 189, 248, 0.25)', color: '#38bdf8', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                    title="Centrar mapa"
+                                >
+                                    <Compass size={13} />
+                                </button>
+                                <button
+                                    onClick={() => handlePan(100, 0)}
+                                    style={{ width: '24px', height: '24px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                    title="Desplaçar dreta"
+                                >
+                                    <ChevronRight size={16} />
+                                </button>
+                                <div />
+                                <button
+                                    onClick={() => handlePan(0, 100)}
+                                    style={{ width: '24px', height: '24px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                                    title="Desplaçar avall"
+                                >
+                                    <ChevronDown size={16} />
+                                </button>
+                                <div />
+                            </div>
+
+                            <div style={{ width: '100%', height: '1px', background: 'rgba(255,255,255,0.15)' }} />
+
+                            <div style={{ display: 'flex', gap: '3px', width: '100%' }}>
+                                <button
+                                    onClick={handleZoomIn}
+                                    style={{ flex: 1, height: '24px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    title="Zoom In"
+                                >
+                                    <Plus size={14} />
+                                </button>
+                                <button
+                                    onClick={handleZoomOut}
+                                    style={{ flex: 1, height: '24px', border: 'none', background: 'rgba(255,255,255,0.12)', color: '#fff', borderRadius: '5px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                                    title="Zoom Out"
+                                >
+                                    <Minus size={14} />
+                                </button>
+                            </div>
                         </div>
                     </div>
 

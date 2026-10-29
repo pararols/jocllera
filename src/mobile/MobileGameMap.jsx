@@ -375,7 +375,12 @@ const MobileGameMap = ({
         }, 3000);
     }, []);
 
+    const lastTapRef = React.useRef(0);
     const handleNodeTap = (inst, e) => {
+        const now = Date.now();
+        if (now - lastTapRef.current < 350) return;
+        lastTapRef.current = now;
+
         // If an enemy is currently attacking this rooftop, expelling the enemy happens IMMEDIATELY,
         // and we STILL proceed to launch the minigame!
         const attackingEnemy = enemies?.find(en => en.targetId === inst.id && (en.isAttacking || en.reachedTarget));

@@ -363,7 +363,7 @@ const MobileApp = (props) => {
 
             {/* MINIGAMES LAYER */}
             {activeMiniGame && (
-                <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh', zIndex: 99999, backgroundColor: '#000' }}>
+                <div style={{ position: 'fixed', top: 0, left: 0, width: 0, height: 0, zIndex: 100000, pointerEvents: 'none' }}>
                     {activeMiniGame === 'connect' && <ConnectTheDots onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
                     {activeMiniGame === 'slider' && <MobileSliderBalance onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
                     {activeMiniGame === 'heatPump' && <MobileHeatPumpHarmony onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}

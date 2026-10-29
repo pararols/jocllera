@@ -30,39 +30,41 @@ const RulesModal = ({ isOpen, onClose }) => {
             desc: "Agents de l'especulació caminen cap a les teulades lliures per drenar-ne els kW. Fes clic ràpidament sobre l'Home de Negre per expulsar-lo abans que privatitzi la instal·lació!"
         },
         {
-            icon: <Award size={28} color="#a855f7" />,
+            icon: <Award size={28} color="#c084fc" />,
             title: "5. Fites Clau per a la Victòria",
-            color: '#a855f7',
+            color: '#c084fc',
             desc: "• 3 teulades ➔ Assemblea veïnal a la Sala Nova 🏛️\n• Sala Nova lliure ➔ Ofensiva d'excedents al Pavelló 🏟️\n• 85% de teulades ➔ Batalla final: Aturem el Plater 🏁\n• 100% de teulades ➔ Expulsió definitiva dels Homes de Negre!"
         },
         {
-            icon: <MousePointer size={28} color="#64748b" />,
+            icon: <MousePointer size={28} color="#94a3b8" />,
             title: "6. Controls del Mapa",
-            color: '#64748b',
+            color: '#94a3b8',
             desc: "Arrossega per moure't pel municipi. Fes zoom amb la roda del ratolí, doble clic o pessigant la pantalla al mòbil. Pots alternar entre vista satèl·lit i mapa base amb el botó inferior."
         }
     ];
 
     return (
         <div style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            backgroundColor: 'rgba(2, 6, 23, 0.82)', zIndex: 12000,
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh',
+            backgroundColor: 'rgba(2, 6, 23, 0.90)', zIndex: 120000,
             display: 'flex', justifyContent: 'center', alignItems: 'center',
-            backdropFilter: 'blur(6px)', padding: '16px'
+            backdropFilter: 'blur(8px)', padding: '16px'
         }} className="animate-fade-in">
-            <div className="glass-panel" style={{
-                width: '100%', maxWidth: '640px', maxHeight: '90vh',
+            <div style={{
+                width: '100%', maxWidth: '640px', maxHeight: '92dvh',
+                background: '#0f172a',
                 padding: '2rem', position: 'relative', display: 'flex',
                 flexDirection: 'column', gap: '1.2rem', borderRadius: '20px',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.6)'
+                border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(245, 158, 11, 0.12)',
+                color: '#ffffff'
             }}>
                 <button
                     onClick={onClose}
                     style={{
                         position: 'absolute', top: 16, right: 16,
-                        background: 'rgba(255,255,255,0.08)', border: 'none',
-                        color: '#cbd5e1', cursor: 'pointer', borderRadius: '50%',
+                        background: 'rgba(255,255,255,0.12)', border: 'none',
+                        color: '#f8fafc', cursor: 'pointer', borderRadius: '50%',
                         width: '36px', height: '36px', display: 'flex',
                         alignItems: 'center', justifyContent: 'center'
                     }}
@@ -71,28 +73,28 @@ const RulesModal = ({ isOpen, onClose }) => {
                 </button>
 
                 <div style={{ textAlign: 'center', paddingRight: '20px' }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#f1c40f', marginBottom: '6px' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', color: '#fbbf24', marginBottom: '6px' }}>
                         <BookOpen size={24} />
                         <span style={{ fontSize: '0.85rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px' }}>
                             Guia de Resistència Veïnal
                         </span>
                     </div>
-                    <h2 className="text-gradient" style={{ fontSize: '1.75rem', margin: 0, fontWeight: 900 }}>
+                    <h2 style={{ fontSize: '1.75rem', margin: 0, fontWeight: 900, color: '#fbbf24', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
                         Regles del Joc
                     </h2>
-                    <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: '4px 0 0 0' }}>
+                    <p style={{ color: '#e2e8f0', fontSize: '0.92rem', margin: '6px 0 0 0', fontWeight: 500 }}>
                         Tot el que necessites saber per defensar Sant Jordi Desvalls i guanyar la partida.
                     </p>
                 </div>
 
                 <div style={{
                     display: 'flex', flexDirection: 'column', gap: '12px',
-                    overflowY: 'auto', paddingRight: '6px', maxHeight: '52vh'
+                    overflowY: 'auto', paddingRight: '6px', maxHeight: '54dvh'
                 }}>
                     {rules.map((rule, idx) => (
                         <div key={idx} style={{
-                            background: 'rgba(15, 23, 42, 0.75)',
-                            border: `1px solid ${rule.color}33`,
+                            background: '#1e293b',
+                            border: `1px solid ${rule.color}44`,
                             borderLeft: `4px solid ${rule.color}`,
                             borderRadius: '12px',
                             padding: '12px 16px',
@@ -107,7 +109,7 @@ const RulesModal = ({ isOpen, onClose }) => {
                                 <span style={{ fontWeight: 800, color: rule.color, fontSize: '0.95rem' }}>
                                     {rule.title}
                                 </span>
-                                <span style={{ color: '#e2e8f0', fontSize: '0.85rem', lineHeight: 1.5, whiteSpace: 'pre-line' }}>
+                                <span style={{ color: '#f8fafc', fontSize: '0.88rem', lineHeight: 1.5, whiteSpace: 'pre-line', fontWeight: 400 }}>
                                     {rule.desc}
                                 </span>
                             </div>
@@ -118,10 +120,12 @@ const RulesModal = ({ isOpen, onClose }) => {
                 <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '4px' }}>
                     <button
                         onClick={onClose}
-                        className="btn btn-primary"
                         style={{
                             padding: '12px 32px', fontSize: '1rem', fontWeight: 800,
-                            borderRadius: '12px', width: '100%'
+                            borderRadius: '12px', width: '100%',
+                            backgroundColor: '#fbbf24', color: '#0f172a',
+                            border: 'none', cursor: 'pointer',
+                            boxShadow: '0 4px 15px rgba(251, 191, 36, 0.45)'
                         }}
                     >
                         Entès, a defensar la Llera! ✊

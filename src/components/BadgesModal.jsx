@@ -44,37 +44,41 @@ const BadgesModal = ({ isOpen, onClose, gameState }) => {
 
     return (
         <div style={{
-            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            backgroundColor: 'rgba(0,0,0,0.75)', zIndex: 11000,
+            position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh',
+            backgroundColor: 'rgba(2, 6, 23, 0.90)', zIndex: 120000,
             display: 'flex', justifyContent: 'center', alignItems: 'center',
-            backdropFilter: 'blur(5px)'
+            backdropFilter: 'blur(8px)', padding: '16px'
         }} className="animate-fade-in">
-            <div className="glass-panel" style={{
-                width: '90%', maxWidth: '500px', padding: '2rem',
-                position: 'relative', display: 'flex', flexDirection: 'column', gap: '1.5rem'
+            <div style={{
+                width: '100%', maxWidth: '520px', maxHeight: '92dvh',
+                background: '#0f172a',
+                padding: '2rem', position: 'relative', display: 'flex', flexDirection: 'column', gap: '1.2rem',
+                borderRadius: '20px', border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                boxShadow: '0 25px 60px rgba(0,0,0,0.95), 0 0 30px rgba(245, 158, 11, 0.12)',
+                color: '#ffffff'
             }}>
                 <button 
                     onClick={onClose} 
-                    style={{ position: 'absolute', top: 15, right: 15, background: 'none', border: 'none', color: '#bdc3c7', cursor: 'pointer' }}
+                    style={{ position: 'absolute', top: 16, right: 16, background: 'rgba(255,255,255,0.12)', border: 'none', color: '#f8fafc', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
                 >
-                    <X size={24} />
+                    <X size={20} />
                 </button>
 
                 <div style={{ textAlign: 'center' }}>
-                    <h2 className="text-gradient" style={{ fontSize: '1.8rem', margin: '0 0 5px 0' }}>Insígnies de Resistència</h2>
-                    <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', margin: 0 }}>El teu progrés recuperant la sobirania local.</p>
+                    <h2 style={{ fontSize: '1.75rem', margin: '0 0 5px 0', fontWeight: 900, color: '#fbbf24', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>Insígnies de Resistència</h2>
+                    <p style={{ color: '#e2e8f0', fontSize: '0.92rem', margin: 0, fontWeight: 500 }}>El teu progrés recuperant la sobirania local.</p>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '350px', overflowY: 'auto', paddingRight: '5px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', maxHeight: '52dvh', overflowY: 'auto', paddingRight: '5px' }}>
                     {BADGES_LIST.map((badge) => {
                         const unlocked = badge.check(gameState);
                         return (
                             <div key={badge.id} style={{
                                 display: 'flex', alignItems: 'center', gap: '15px',
-                                padding: '12px', borderRadius: '12px',
-                                backgroundColor: unlocked ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.2)',
-                                border: `1px solid ${unlocked ? 'rgba(255, 255, 255, 0.1)' : 'rgba(255, 255, 255, 0.02)'}`,
-                                opacity: unlocked ? 1 : 0.6,
+                                padding: '12px 14px', borderRadius: '12px',
+                                backgroundColor: unlocked ? '#1e293b' : 'rgba(30, 41, 59, 0.5)',
+                                border: `1px solid ${unlocked ? '#10b981' : 'rgba(255, 255, 255, 0.1)'}`,
+                                opacity: unlocked ? 1 : 0.65,
                                 transition: 'all 0.3s ease'
                             }}>
                                 <div style={{

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Play, ArrowRight, ArrowLeft, Target, Zap, Globe, RotateCcw, BookOpen } from 'lucide-react';
+import { Play, ArrowRight, ArrowLeft, Target, Zap, Globe, RotateCcw, BookOpen, Shield, Users } from 'lucide-react';
 import RulesModal from './RulesModal';
 
 const WelcomeScreen = ({ onStart, onReset, savedProgressCount = 0 }) => {
@@ -8,31 +8,37 @@ const WelcomeScreen = ({ onStart, onReset, savedProgressCount = 0 }) => {
 
     const steps = [
         {
-            title: "L'Últim Cavaller de la Llera",
-            subtitle: "Benvingut a la resistència",
-            text: "L'especulació d'El Plater amenaça amb cobrir la nostra terra sota un mantell gris. La Vall del Ter necessita la teva energia per alliberar les 31 teulades i aturar l'amenaça abans que arribi al 100%.",
-            icon: <Globe size={48} color="var(--color-primary)" />,
+            title: "L'ÚLTIM CAVALLER DE LA LLERA",
+            subtitle: "La Vall del Ter necessita la teva energia.",
+            text: "L'especulació d'El Plater amenaça amb cobrir la nostra terra i ofegar la sobirania del poble sota un mantell gris. Però l'esperança no està perduda...",
+            icon: <Globe size={48} color="#38bdf8" />,
+            missionBox: true,
             action: "Següent"
         },
         {
             title: "Sobirania Energètica",
-            subtitle: "Explora i actua",
-            text: "Navega pel mapa i fes clic a les teulades per alliberar-les superant minijocs d'habilitat i coneixement. Atura els 'Homes de Negre' fent-hi clic quan intentin privatitzar el poble!",
-            icon: <Zap size={48} color="var(--color-accent)" />,
+            subtitle: "Explora, connecta i allibera",
+            text: "Navega pel municipi de Sant Jordi Desvalls i fes clic a les teulades per alliberar-les superant minijocs solars d'habilitat i equilibri.\n\nAtura els «Homes de Negre» fent-hi clic quan intentin privatitzar el poble!",
+            icon: <Zap size={48} color="#f59e0b" />,
             action: "Següent"
         },
         {
             title: "Regles i Dinàmica de Joc",
             subtitle: "Estratègia de resistència",
-            text: "• Clic a teulada ➔ Supera el minijoc solar per alliberar-la.\n• Contagi 180m ➔ S'alliberen automàticament les teulades properes!\n• Clic a l'Home de Negre ➔ Expulsa'l abans que dreni els kW!\n• Fites ➔ Sala Nova (3 teulades), Pavelló i Aturem el Plater (85%).",
-            icon: <BookOpen size={48} color="#f59e0b" />,
+            icon: <BookOpen size={48} color="#10b981" />,
+            rulesList: [
+                { icon: "⚡", title: "Clic a Teulada", desc: "Supera el minijoc solar per alliberar-la i sumar energia verda.", color: "#10b981" },
+                { icon: "🌊", title: "Contagi Veïnal (180m)", desc: "En alliberar una teulada, s'alliberen en cadena les teulades properes!", color: "#38bdf8" },
+                { icon: "🕵️", title: "Homes de Negre", desc: "Fes-hi clic ràpidament per expulsar-los abans que robin kW!", color: "#ef4444" },
+                { icon: "🏛️", title: "Fites Clau", desc: "Sala Nova (3 teulades), Pavelló d'Excedents i Batalla Final (85%).", color: "#f59e0b" }
+            ],
             action: "Següent"
         },
         {
             title: "Aturem el Plater!",
             subtitle: "L'objectiu final",
             text: "Allibera la Sala Nova (a partir de 3 teulades), connecta el Pavelló Municipal i assoleix el 85% de la sobirania del poble per desbloquejar la missió definitiva contra El Plater.",
-            icon: <Target size={48} color="var(--color-warning)" />,
+            icon: <Target size={48} color="#ec4899" />,
             action: "Començar l'Aventura"
         }
     ];
@@ -54,62 +60,276 @@ const WelcomeScreen = ({ onStart, onReset, savedProgressCount = 0 }) => {
     };
 
     return (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center' }} className="animate-fade-in">
-            <div className="glass-panel" style={{ padding: '2.5rem', maxWidth: '520px', width: '92%', textAlign: 'center', position: 'relative' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.2rem', animation: 'fadeIn 0.5s ease-out' }}>
+        <div
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100dvh',
+                backgroundColor: 'rgba(2, 6, 23, 0.90)',
+                zIndex: 100000,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backdropFilter: 'blur(8px)',
+                padding: '16px'
+            }}
+            className="animate-fade-in"
+        >
+            <div
+                style={{
+                    background: '#0f172a',
+                    border: '1.5px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '20px',
+                    boxShadow: '0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(245, 158, 11, 0.15)',
+                    padding: '2rem 1.8rem',
+                    maxWidth: '540px',
+                    width: '100%',
+                    maxHeight: '94dvh',
+                    overflowY: 'auto',
+                    textAlign: 'center',
+                    position: 'relative',
+                    color: '#ffffff'
+                }}
+            >
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', animation: 'fadeIn 0.4s ease-out' }}>
                     {currentStep.icon}
                 </div>
                 
-                <h1 className="text-gradient" style={{ fontSize: '1.8rem', marginBottom: '0.4rem' }}>{currentStep.title}</h1>
-                <h2 style={{ fontSize: '1.05rem', color: 'var(--color-text-muted)', marginBottom: '1.2rem' }}>{currentStep.subtitle}</h2>
-                <p style={{ fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem', minHeight: '90px' }}>
-                    {currentStep.text}
-                </p>
+                <h1 style={{
+                    fontSize: '1.65rem',
+                    fontWeight: 900,
+                    color: '#fbbf24',
+                    textShadow: '0 2px 10px rgba(0,0,0,0.9)',
+                    letterSpacing: '0.5px',
+                    marginBottom: '0.35rem',
+                    lineHeight: 1.2
+                }}>
+                    {currentStep.title}
+                </h1>
+
+                <h2 style={{
+                    fontSize: '1.05rem',
+                    color: '#e2e8f0',
+                    fontWeight: 600,
+                    marginBottom: '1.1rem'
+                }}>
+                    {currentStep.subtitle}
+                </h2>
+
+                {currentStep.missionBox && (
+                    <div style={{
+                        backgroundColor: '#1e293b',
+                        border: '1px solid rgba(255, 255, 255, 0.15)',
+                        borderRadius: '12px',
+                        padding: '14px 16px',
+                        margin: '14px 0 18px 0',
+                        textAlign: 'left',
+                        boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.5)'
+                    }}>
+                        <div style={{
+                            fontSize: '0.85rem',
+                            fontWeight: 900,
+                            color: '#fbbf24',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1px',
+                            marginBottom: '10px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                        }}>
+                            🎯 LA TEVA MISSIÓ:
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '9px', fontSize: '0.92rem', color: '#f8fafc' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>🌍</span>
+                                <span><strong style={{ color: '#38bdf8' }}>EXPLORA</strong> el mapa de Sant Jordi Desvalls.</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>⚡</span>
+                                <span><strong style={{ color: '#10b981' }}>ALLIBERA</strong> les teulades veïnals per generar energia neta.</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>🤝</span>
+                                <span><strong style={{ color: '#f59e0b' }}>CONNECTA</strong> els punts de resistència (ona de 180m).</span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <span style={{ fontSize: '1.25rem', flexShrink: 0 }}>🎮</span>
+                                <span><strong style={{ color: '#ec4899' }}>SUPERA</strong> els mini-jocs i expulsa els Homes de Negre.</span>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {currentStep.rulesList ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', textAlign: 'left', marginBottom: '1.6rem' }}>
+                        {currentStep.rulesList.map((r, i) => (
+                            <div
+                                key={i}
+                                style={{
+                                    background: '#1e293b',
+                                    borderLeft: `4px solid ${r.color}`,
+                                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                                    borderRight: '1px solid rgba(255,255,255,0.06)',
+                                    borderBottom: '1px solid rgba(255,255,255,0.06)',
+                                    borderRadius: '8px',
+                                    padding: '10px 14px',
+                                    display: 'flex',
+                                    gap: '10px',
+                                    alignItems: 'center'
+                                }}
+                            >
+                                <span style={{ fontSize: '1.2rem', flexShrink: 0 }}>{r.icon}</span>
+                                <div style={{ fontSize: '0.88rem', lineHeight: 1.4 }}>
+                                    <strong style={{ color: r.color }}>{r.title}:</strong>{' '}
+                                    <span style={{ color: '#f1f5f9' }}>{r.desc}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p style={{
+                        fontSize: '0.98rem',
+                        lineHeight: 1.6,
+                        color: '#f8fafc',
+                        fontWeight: 500,
+                        whiteSpace: 'pre-line',
+                        marginBottom: '1.8rem',
+                        minHeight: currentStep.missionBox ? 'auto' : '85px',
+                        textShadow: '0 1px 3px rgba(0,0,0,0.8)'
+                    }}>
+                        {currentStep.text}
+                    </p>
+                )}
 
                 {savedProgressCount > 0 && step === 0 && (
-                    <div style={{ backgroundColor: 'rgba(46, 204, 113, 0.15)', border: '1px solid #2ecc71', borderRadius: '12px', padding: '12px', marginBottom: '20px', fontSize: '0.9rem' }}>
-                        <div style={{ fontWeight: 'bold', color: '#2ecc71', marginBottom: '8px' }}>
+                    <div style={{
+                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                        border: '1.5px solid #10b981',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        marginBottom: '18px',
+                        fontSize: '0.92rem'
+                    }}>
+                        <div style={{ fontWeight: 800, color: '#34d399', marginBottom: '8px' }}>
                             Partida anterior trobada ({savedProgressCount} punts alliberats)
                         </div>
-                        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-                            <button className="btn btn-primary" onClick={onStart} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                            <button
+                                onClick={onStart}
+                                style={{
+                                    backgroundColor: '#10b981',
+                                    color: '#ffffff',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    padding: '8px 16px',
+                                    fontSize: '0.88rem',
+                                    fontWeight: 700,
+                                    cursor: 'pointer'
+                                }}
+                            >
                                 Continuar partida
                             </button>
-                            <button className="btn btn-secondary" onClick={onReset} style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', color: '#e74c3c' }}>
-                                <RotateCcw size={14} style={{ marginRight: '4px' }} /> Reiniciar de zero
+                            <button
+                                onClick={onReset}
+                                style={{
+                                    backgroundColor: 'transparent',
+                                    border: '1px solid #ef4444',
+                                    color: '#f87171',
+                                    borderRadius: '8px',
+                                    padding: '8px 14px',
+                                    fontSize: '0.88rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px'
+                                }}
+                            >
+                                <RotateCcw size={14} /> Reiniciar de zero
                             </button>
                         </div>
                     </div>
                 )}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div style={{ minWidth: '90px', textAlign: 'left' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
+                    <div style={{ minWidth: '95px', textAlign: 'left' }}>
                         {step > 0 && (
-                            <button className="btn btn-secondary" onClick={handlePrev} style={{ padding: '0.5rem 1rem' }}>
+                            <button
+                                onClick={handlePrev}
+                                style={{
+                                    backgroundColor: '#334155',
+                                    color: '#f8fafc',
+                                    border: '1px solid rgba(255,255,255,0.15)',
+                                    borderRadius: '10px',
+                                    padding: '10px 16px',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                }}
+                            >
                                 <ArrowLeft size={16} /> Anterior
                             </button>
                         )}
                     </div>
-                    <div style={{ display: 'flex', gap: '6px' }}>
+
+                    <div style={{ display: 'flex', gap: '8px' }}>
                         {steps.map((_, i) => (
-                            <div key={i} style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: i === step ? 'var(--color-primary)' : 'rgba(255,255,255,0.2)', transition: 'background-color 0.3s' }} />
+                            <div
+                                key={i}
+                                style={{
+                                    width: i === step ? '22px' : '9px',
+                                    height: '9px',
+                                    borderRadius: '6px',
+                                    backgroundColor: i === step ? '#fbbf24' : 'rgba(255,255,255,0.25)',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            />
                         ))}
                     </div>
-                    <div style={{ minWidth: '90px', textAlign: 'right' }}>
-                        <button className="btn btn-primary" onClick={handleNext} style={{ padding: '0.5rem 1rem' }}>
-                            {step === steps.length - 1 ? <Play size={16} /> : <ArrowRight size={16} />} 
-                            <span style={{ marginLeft: '5px' }}>{currentStep.action}</span>
+
+                    <div style={{ minWidth: '95px', textAlign: 'right' }}>
+                        <button
+                            onClick={handleNext}
+                            style={{
+                                backgroundColor: '#fbbf24',
+                                color: '#0f172a',
+                                border: 'none',
+                                borderRadius: '10px',
+                                padding: '10px 18px',
+                                fontSize: '0.92rem',
+                                fontWeight: 800,
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '6px',
+                                boxShadow: '0 4px 15px rgba(251, 191, 36, 0.45)'
+                            }}
+                        >
+                            {step === steps.length - 1 ? <Play size={16} fill="#0f172a" /> : null}
+                            <span>{currentStep.action}</span>
+                            {step < steps.length - 1 ? <ArrowRight size={16} /> : null}
                         </button>
                     </div>
                 </div>
 
-                <div style={{ marginTop: '1.4rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '0.9rem' }}>
+                <div style={{ marginTop: '1.4rem', borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '0.9rem' }}>
                     <button
                         onClick={() => setShowRulesModal(true)}
                         style={{
-                            background: 'none', border: 'none', color: '#f1c40f',
-                            cursor: 'pointer', fontSize: '0.85rem', display: 'inline-flex',
-                            alignItems: 'center', gap: '6px', fontWeight: 'bold'
+                            background: 'none',
+                            border: 'none',
+                            color: '#fbbf24',
+                            cursor: 'pointer',
+                            fontSize: '0.88rem',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            fontWeight: 700
                         }}
                     >
                         <BookOpen size={16} /> 📜 Veure totes les regles detallades

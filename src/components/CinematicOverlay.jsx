@@ -1,73 +1,76 @@
-import React, { useState, useEffect } from 'react';
-import { Play, SkipForward, ChevronRight } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronRight } from 'lucide-react';
 
 const CinematicOverlay = ({ phase, onComplete }) => {
     const [step, setStep] = useState(0);
-    const [isPlayingVideo, setIsPlayingVideo] = useState(true);
 
-    // Auto-skip if no video is present for some reason
-    useEffect(() => {
-        if (isPlayingVideo && !phase.video) {
-            setIsPlayingVideo(false);
-        }
-    }, [isPlayingVideo, phase.video]);
+    if (!phase) return null;
 
     const handleNext = () => {
         if (step < phase.dialogue.length - 1) {
-            setStep(step + 1);
+            setStep(s => s + 1);
         } else {
             onComplete();
         }
     };
 
-    if (isPlayingVideo && phase.video) {
+    if (phase.video) {
         return (
             <div style={{
-                position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh',
-                backgroundColor: 'black', zIndex: 20000, overflow: 'hidden'
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100dvh',
+                backgroundColor: '#000000',
+                zIndex: 110000,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center'
             }}>
-                <style>
-                    {`
-                    .cinematic-video {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: contain;
-                    }
-                    .skip-btn {
-                        position: absolute;
-                        top: 20px;
-                        right: 20px;
-                        background: rgba(0,0,0,0.6);
-                        border: 1px solid white;
-                        color: white;
-                        padding: 10px 20px;
-                        border-radius: 8px;
-                        font-weight: bold;
-                        cursor: pointer;
-                        display: flex;
-                        align-items: center;
-                        gap: 10px;
-                        z-index: 20001;
-                    }
-                    .skip-btn:hover {
-                        background: rgba(0,0,0,0.9);
-                    }
-                    `}
-                </style>
                 <video
                     src={phase.video}
-                    className="cinematic-video"
+                    controls
                     autoPlay
                     playsInline
-                    controls
-                    onEnded={() => setIsPlayingVideo(false)}
+                    style={{
+                        width: '100%',
+                        maxHeight: '82vh',
+                        objectFit: 'contain',
+                        backgroundColor: '#000'
+                    }}
+                    onEnded={() => onComplete()}
                 />
-                <button
-                    onClick={() => setIsPlayingVideo(false)}
-                    className="skip-btn"
-                >
-                    SALTA INTRO <SkipForward size={16} />
-                </button>
+                <div style={{
+                    position: 'absolute',
+                    bottom: '24px',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    width: '100%',
+                    padding: '0 20px',
+                    pointerEvents: 'auto'
+                }}>
+                    <button
+                        onClick={onComplete}
+                        style={{
+                            background: '#fbbf24',
+                            color: '#0f172a',
+                            border: 'none',
+                            padding: '12px 28px',
+                            fontWeight: 800,
+                            fontSize: '1rem',
+                            borderRadius: '50px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            boxShadow: '0 6px 20px rgba(251, 191, 36, 0.5)'
+                        }}
+                    >
+                        SALTAR VÍDEO I CONTINUAR <ChevronRight size={20} />
+                    </button>
+                </div>
             </div>
         );
     }
@@ -76,32 +79,77 @@ const CinematicOverlay = ({ phase, onComplete }) => {
 
     return (
         <div style={{
-            position: 'fixed', bottom: 0, left: 0, width: '100vw', height: '100dvh',
-            background: 'rgba(0,0,0,0.4)', zIndex: 11000, display: 'flex', flexDirection: 'column',
-            justifyContent: 'flex-end', pointerEvents: 'auto'
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            width: '100vw',
+            height: '100dvh',
+            background: 'rgba(2, 6, 23, 0.75)',
+            zIndex: 110000,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            pointerEvents: 'auto'
         }}>
             <div style={{
-                background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.8) 70%, transparent 100%)',
-                padding: '20px', color: 'white', minHeight: '200px'
+                background: '#090d16',
+                borderTop: '3px solid #fbbf24',
+                boxShadow: '0 -15px 40px rgba(0,0,0,0.95)',
+                padding: '24px 20px',
+                color: '#ffffff',
+                minHeight: '180px'
             }}>
                 <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative' }}>
-                    <h3 style={{ color: '#f1c40f', margin: '0 0 10px 0', fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '2px' }}>
-                        {currentLine.character}
-                    </h3>
-                    <p style={{ fontSize: '1.2rem', lineHeight: '1.4', margin: 0, fontWeight: '300' }}>
+                    <div style={{
+                        display: 'inline-block',
+                        backgroundColor: 'rgba(251, 191, 36, 0.15)',
+                        border: '1.5px solid #fbbf24',
+                        borderRadius: '6px',
+                        padding: '4px 12px',
+                        marginBottom: '12px'
+                    }}>
+                        <h3 style={{
+                            color: '#fbbf24',
+                            margin: 0,
+                            fontSize: '0.95rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '1.5px',
+                            fontWeight: 800
+                        }}>
+                            {currentLine.character}
+                        </h3>
+                    </div>
+
+                    <p style={{
+                        fontSize: '1.25rem',
+                        lineHeight: '1.55',
+                        margin: 0,
+                        fontWeight: 600,
+                        color: '#ffffff',
+                        textShadow: '0 2px 6px rgba(0,0,0,0.95)'
+                    }}>
                         {currentLine.text}
                     </p>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '22px' }}>
                         <button
                             onClick={handleNext}
                             style={{
-                                background: '#f1c40f', color: '#000', border: 'none',
-                                padding: '10px 20px', fontWeight: 'bold', fontSize: '1rem',
-                                borderRadius: '50px', cursor: 'pointer', display: 'flex',
-                                alignItems: 'center', gap: '8px', boxShadow: '0 4px 15px rgba(241, 196, 15, 0.4)'
+                                background: '#fbbf24',
+                                color: '#0f172a',
+                                border: 'none',
+                                padding: '12px 26px',
+                                fontWeight: 800,
+                                fontSize: '1rem',
+                                borderRadius: '50px',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 18px rgba(251, 191, 36, 0.5)'
                             }}
                         >
-                            {step < phase.dialogue.length - 1 ? 'SEGÜENT' : 'ENTRER AL JOC'}
+                            {step < phase.dialogue.length - 1 ? 'SEGÜENT' : 'ENTRAR AL JOC'}
                             <ChevronRight size={18} />
                         </button>
                     </div>

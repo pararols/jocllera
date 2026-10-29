@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Target, Activity, Settings, Map as MapIcon, ShieldAlert, MapPin, BarChart2, Compass, Award } from 'lucide-react';
+import { Target, Activity, Settings, Map as MapIcon, ShieldAlert, MapPin, BarChart2, Compass, Award, BookOpen } from 'lucide-react';
 import MobileGameMap from './MobileGameMap';
 
 // Minigames
@@ -20,6 +20,7 @@ import CinematicOverlay from '../components/CinematicOverlay';
 import MusicPlayer from '../components/MusicPlayer';
 import WelcomeScreen from '../components/WelcomeScreen';
 import BadgesModal from '../components/BadgesModal';
+import RulesModal from '../components/RulesModal';
 import { NARRATIVE_PHASES } from '../data/narrative_content';
 import gisData from '../data/gis_data.json';
 const salaNovaBg = '/assets/sala_nova_interior.png';
@@ -65,6 +66,7 @@ const MobileApp = (props) => {
     // Bottom Sheet Navigation State
     const [activeTab, setActiveTab] = useState('map'); // map, resources
     const [showBadges, setShowBadges] = useState(false);
+    const [showRules, setShowRules] = useState(false);
 
     const totalRooftopNodes = gisData.installations.filter(i => i.type === 'rooftop').length;
     const liberatedRooftopsCount = Array.from(liberatedNodes).filter(id => {
@@ -258,6 +260,13 @@ const MobileApp = (props) => {
                     <Activity size={22} />
                     <span style={{ fontSize: '0.72rem', marginTop: '3px', fontWeight: activeTab === 'resources' ? 'bold' : 'normal' }}>Recursos</span>
                 </button>
+                <button
+                    onClick={() => setShowRules(true)}
+                    style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer' }}
+                >
+                    <BookOpen size={22} color="#38bdf8" />
+                    <span style={{ fontSize: '0.72rem', marginTop: '3px' }}>Regles</span>
+                </button>
             </nav>
 
             {/* MODALS & OVERLAYS */}
@@ -286,7 +295,15 @@ const MobileApp = (props) => {
             {showVictoryModal && (
                 <div className="modal-overlay" style={{ padding: '16px', zIndex: 100000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <div className="modal-content victory" style={{ width: '100%', maxWidth: '420px', maxHeight: '90vh', overflowY: 'auto', textAlign: 'center', padding: '20px', borderRadius: '20px', border: '2px solid rgba(16, 185, 129, 0.6)' }}>
-                        <img src="/cinematics/celdoni_peace.png" alt="Victòria" style={{ width: '100%', maxHeight: '160px', objectFit: 'cover', borderRadius: '14px', marginBottom: '12px' }} />
+                        <video
+                            src="/cinematics/celdoni_video_victory.mp4"
+                            poster="/cinematics/celdoni_victory_epic.png"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            style={{ width: '100%', maxHeight: '160px', objectFit: 'cover', borderRadius: '14px', marginBottom: '12px', border: '1px solid rgba(16, 185, 129, 0.4)' }}
+                        />
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#10b981', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase' }}>
                             🏆 Victòria Comunitària Total
                         </div>
@@ -371,6 +388,11 @@ const MobileApp = (props) => {
                     clearedBadsCount: clearedBads.size,
                     totalRooftops: totalRooftopNodes
                 }} 
+            />
+
+            <RulesModal
+                isOpen={showRules}
+                onClose={() => setShowRules(false)}
             />
         </div>
     );

@@ -282,7 +282,7 @@ const MobileApp = (props) => {
                 />
             )}
             
-            <MusicPlayer phase={gamePhase} />
+            <MusicPlayer phase={gamePhase} isMobile={true} canAturarPlater={canAturarPlater} />
 
             {showCinematic && (
                 <CinematicOverlay

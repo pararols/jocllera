@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, useMap, useMapEvents, I
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import gisData from '../data/gis_data.json';
-import { Leaf, DollarSign, Wind, Flame, Droplets, Zap, ShieldAlert, Cpu, Coins, Ban, X, TreeDeciduous, Map as MapIcon, Layers, Play, RotateCcw } from 'lucide-react';
+import { Leaf, DollarSign, Wind, Flame, Droplets, Zap, ShieldAlert, Cpu, Coins, Ban, X, TreeDeciduous, Map as MapIcon, Play, RotateCcw } from 'lucide-react';
 import SoundManager from '../logic/SoundManager';
 
 // Fix for default marker icon in React-Leaflet
@@ -456,20 +456,6 @@ const MobileGameMap = ({
                 }
             `}</style>
 
-            {/* Quick Layer Switcher */}
-            <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 500, display: 'flex', gap: '8px' }}>
-                <button
-                    onClick={() => setMapType(prev => prev === 'ortho' ? 'osm' : 'ortho')}
-                    style={{
-                        backgroundColor: 'white', border: '1px solid #cbd5e1', borderRadius: '20px',
-                        padding: '6px 14px', fontSize: '0.8rem', fontWeight: 'bold', display: 'flex',
-                        alignItems: 'center', gap: '5px', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', color: '#334155'
-                    }}
-                >
-                    <Layers size={14} /> {mapType === 'ortho' ? 'Satèl·lit' : 'Mapa'}
-                </button>
-            </div>
-
             <div style={{ height: '100%', width: '100%', position: 'relative' }}>
                 <MapContainer
                     center={position}
@@ -479,17 +465,12 @@ const MobileGameMap = ({
                 >
                     <MapEventListener lastDamageEvent={lastDamageEvent} addDamageText={addDamageText} onMapClickRoof={handleMapClickRoof} />
 
-                    {mapType === 'ortho' ? (
-                        <TileLayer
-                            url="https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.icgc.cat">ICGC</a>'
-                        />
-                    ) : (
-                        <TileLayer
-                            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                            attribution='&copy; CARTO'
-                        />
-                    )}
+                    {/* Vista Satèl·lit / Ortofoto Oficial ICGC */}
+                    <TileLayer
+                        url="https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.icgc.cat">ICGC</a> Ortofoto'
+                        maxZoom={19}
+                    />
 
                     {gisData.speculationOverlays && gisData.speculationOverlays.map(overlay => (
                         <ImageOverlay

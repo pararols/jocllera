@@ -674,9 +674,6 @@ function App() {
           <button className={isAdmin ? 'btn btn-primary' : 'btn btn-secondary'} onClick={handleAdminAuth}>
             {isAdmin ? 'Admin OK' : 'Administrador'}
           </button>
-          <button className="btn btn-secondary" onClick={() => setMapType(mapType === 'ortho' ? 'light' : 'ortho')}>
-            {mapType === 'ortho' ? '🗺️ Mapa Base' : '🛰️ Ortofoto'}
-          </button>
           {isAdmin && (
             <>
               <button className="btn btn-secondary" style={{ backgroundColor: showEditor ? 'var(--color-warning)' : 'transparent' }} onClick={() => setShowEditor(!showEditor)}>

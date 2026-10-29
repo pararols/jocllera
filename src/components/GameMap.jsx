@@ -438,17 +438,12 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
             >
                 <MapEventListener lastDamageEvent={lastDamageEvent} addDamageText={addDamageText} onMapClickRoof={handleMapClickRoof} />
 
-                {mapType === 'ortho' ? (
-                    <TileLayer
-                        url="https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857/{z}/{x}/{y}.png"
-                        attribution='&copy; <a href="https://www.icgc.cat">ICGC</a>'
-                    />
-                ) : (
-                    <TileLayer
-                        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-                        attribution='&copy; CARTO'
-                    />
-                )}
+                {/* Vista Satèl·lit / Ortofoto Oficial ICGC */}
+                <TileLayer
+                    url="https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/orto/GRID3857/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.icgc.cat">ICGC</a> Ortofoto'
+                    maxZoom={19}
+                />
 
                 {gisData.speculationOverlays && gisData.speculationOverlays.map(overlay => (
                     <ImageOverlay

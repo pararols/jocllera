@@ -1,27 +1,29 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { Network, Battery, Activity, Zap, ShieldAlert, Radio, AlertTriangle, Compass, Award, BookOpen } from 'lucide-react';
 import GameMap from './components/GameMap';
-import ZoneEditor from './components/ZoneEditor';
 import CinematicOverlay from './components/CinematicOverlay';
 import MusicPlayer from './components/MusicPlayer';
 import WelcomeScreen from './components/WelcomeScreen';
-import MobileApp from './mobile/MobileApp';
 import BadgesModal from './components/BadgesModal';
 import RulesModal from './components/RulesModal';
 
-// Minigames
-import ConnectTheDots from './components/minigames/ConnectTheDots';
-import SliderBalance from './components/minigames/SliderBalance';
-import HeatPumpHarmony from './components/minigames/HeatPumpHarmony';
-import HeatHazeSabotage from './components/minigames/HeatHazeSabotage';
-import AquiferDefense from './components/minigames/AquiferDefense';
-import EvaporationRace from './components/minigames/EvaporationRace';
-import AturemPlater from './components/minigames/AturemPlater';
-import RhythmGame from './components/minigames/RhythmGame';
-import CommunityEnergy from './components/minigames/CommunityEnergy';
-import PavelloTycoon from './components/minigames/PavelloTycoon';
-import QuizSobirania from './components/minigames/QuizSobirania';
-import BalanceEnergetic from './components/minigames/BalanceEnergetic';
+// Lazy Loaded Components
+const MobileApp = lazy(() => import('./mobile/MobileApp'));
+const ZoneEditor = lazy(() => import('./components/ZoneEditor'));
+
+// Lazy Loaded Minigames
+const ConnectTheDots = lazy(() => import('./components/minigames/ConnectTheDots'));
+const SliderBalance = lazy(() => import('./components/minigames/SliderBalance'));
+const HeatPumpHarmony = lazy(() => import('./components/minigames/HeatPumpHarmony'));
+const HeatHazeSabotage = lazy(() => import('./components/minigames/HeatHazeSabotage'));
+const AquiferDefense = lazy(() => import('./components/minigames/AquiferDefense'));
+const EvaporationRace = lazy(() => import('./components/minigames/EvaporationRace'));
+const AturemPlater = lazy(() => import('./components/minigames/AturemPlater'));
+const RhythmGame = lazy(() => import('./components/minigames/RhythmGame'));
+const CommunityEnergy = lazy(() => import('./components/minigames/CommunityEnergy'));
+const PavelloTycoon = lazy(() => import('./components/minigames/PavelloTycoon'));
+const QuizSobirania = lazy(() => import('./components/minigames/QuizSobirania'));
+const BalanceEnergetic = lazy(() => import('./components/minigames/BalanceEnergetic'));
 import gisData from './data/gis_data.json';
 import { NARRATIVE_PHASES } from './data/narrative_content';
 import { EnemySystem } from './logic/EnemySystem';
@@ -617,43 +619,50 @@ function App() {
 
   if (isMobileDevice) {
     return (
-      <MobileApp
-        liberatedNodes={liberatedNodes}
-        clearedBads={clearedBads}
-        enemies={enemies}
-        showStartModal={showStartModal}
-        setShowStartModal={setShowStartModal}
-        showVictoryModal={showVictoryModal}
-        setShowVictoryModal={setShowVictoryModal}
-        lastDamageEvent={lastDamageEvent}
-        co2Bonus={co2Bonus}
-        gamePhase={gamePhase}
-        showCinematic={showCinematic}
-        setShowCinematic={setShowCinematic}
-        activeMiniGame={activeMiniGame}
-        setActiveMiniGame={setActiveMiniGame}
-        pendingNode={pendingNode}
-        setPendingNode={setPendingNode}
-        corruptionLevel={corruptionLevel}
-        setGamePhase={setGamePhase}
-        handleLiberateNode={handleLiberateNode}
-        handleEnemyClick={handleEnemyClick}
-        handleBadNodeClick={handleBadNodeClick}
-        handleImpact={handleImpact}
-        handlePenalty={handlePenalty}
-        completeBadNode={completeBadNode}
-        calculateStats={calculateStats}
-        completeLiberation={completeLiberation}
-        mapType={mapType}
-        setMapType={setMapType}
-        currentMission={getCurrentMission()}
-        onResetGame={handleResetGame}
-        onStartGame={handleStartGame}
-        contagionToast={contagionToast}
-        setContagionToast={setContagionToast}
-        contagionWave={contagionWave}
-        nodePowers={nodePowers}
-      />
+      <Suspense fallback={
+        <div style={{ width: '100vw', height: '100dvh', backgroundColor: '#0f172a', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', border: '4px solid #10b981', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+          <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#38bdf8' }}>Carregant La Llera Viva...</span>
+        </div>
+      }>
+        <MobileApp
+          liberatedNodes={liberatedNodes}
+          clearedBads={clearedBads}
+          enemies={enemies}
+          showStartModal={showStartModal}
+          setShowStartModal={setShowStartModal}
+          showVictoryModal={showVictoryModal}
+          setShowVictoryModal={setShowVictoryModal}
+          lastDamageEvent={lastDamageEvent}
+          co2Bonus={co2Bonus}
+          gamePhase={gamePhase}
+          showCinematic={showCinematic}
+          setShowCinematic={setShowCinematic}
+          activeMiniGame={activeMiniGame}
+          setActiveMiniGame={setActiveMiniGame}
+          pendingNode={pendingNode}
+          setPendingNode={setPendingNode}
+          corruptionLevel={corruptionLevel}
+          setGamePhase={setGamePhase}
+          handleLiberateNode={handleLiberateNode}
+          handleEnemyClick={handleEnemyClick}
+          handleBadNodeClick={handleBadNodeClick}
+          handleImpact={handleImpact}
+          handlePenalty={handlePenalty}
+          completeBadNode={completeBadNode}
+          calculateStats={calculateStats}
+          completeLiberation={completeLiberation}
+          mapType={mapType}
+          setMapType={setMapType}
+          currentMission={getCurrentMission()}
+          onResetGame={handleResetGame}
+          onStartGame={handleStartGame}
+          contagionToast={contagionToast}
+          setContagionToast={setContagionToast}
+          contagionWave={contagionWave}
+          nodePowers={nodePowers}
+        />
+      </Suspense>
     );
   }
 
@@ -820,25 +829,36 @@ function App() {
           contagionWave={contagionWave}
           nodePowers={nodePowers}
         >
-          {showEditor && <ZoneEditor onClose={() => setShowEditor(false)} />}
+          {showEditor && (
+            <Suspense fallback={null}>
+              <ZoneEditor onClose={() => setShowEditor(false)} />
+            </Suspense>
+          )}
         </GameMap>
       </main>
 
       {/* MINIGAMES OVERLAYS */}
       {activeMiniGame && (
         <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 9999 }}>
-          {activeMiniGame === 'connect' && <ConnectTheDots onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
-          {activeMiniGame === 'slider' && <SliderBalance onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-          {activeMiniGame === 'heatPump' && <HeatPumpHarmony onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
-          {activeMiniGame === 'rhythm' && <RhythmGame onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-          {activeMiniGame === 'community' && <CommunityEnergy onComplete={(reduction) => completeLiberation(pendingNode?.id, reduction)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={pendingNode?.id === 'pavello_001' ? 70 : 20} backgroundOverride={pendingNode?.id === 'sala_nova_001' ? salaNovaBg : null} />}
-          {activeMiniGame === 'tycoon' && <PavelloTycoon onComplete={(reduction) => completeLiberation(pendingNode?.id, reduction)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={70} />}
-          {activeMiniGame === 'quiz' && <QuizSobirania onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-          {activeMiniGame === 'balance' && <BalanceEnergetic onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-          {activeMiniGame === 'heatHaze' && <HeatHazeSabotage onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
-          {activeMiniGame === 'aquifer' && <AquiferDefense onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-          {activeMiniGame === 'evaporation' && <EvaporationRace onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-          {activeMiniGame === 'aturemPlater' && <AturemPlater onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
+          <Suspense fallback={
+            <div className="minigame-overlay" style={{ display: 'flex', flexDirection: 'column', gap: '12px', color: '#ffffff' }}>
+              <div style={{ width: '42px', height: '42px', border: '4px solid #10b981', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+              <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>Carregant minijoc...</span>
+            </div>
+          }>
+            {activeMiniGame === 'connect' && <ConnectTheDots onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
+            {activeMiniGame === 'slider' && <SliderBalance onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+            {activeMiniGame === 'heatPump' && <HeatPumpHarmony onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
+            {activeMiniGame === 'rhythm' && <RhythmGame onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+            {activeMiniGame === 'community' && <CommunityEnergy onComplete={(reduction) => completeLiberation(pendingNode?.id, reduction)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={pendingNode?.id === 'pavello_001' ? 70 : 20} backgroundOverride={pendingNode?.id === 'sala_nova_001' ? salaNovaBg : null} />}
+            {activeMiniGame === 'tycoon' && <PavelloTycoon onComplete={(reduction) => completeLiberation(pendingNode?.id, reduction)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={70} />}
+            {activeMiniGame === 'quiz' && <QuizSobirania onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+            {activeMiniGame === 'balance' && <BalanceEnergetic onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+            {activeMiniGame === 'heatHaze' && <HeatHazeSabotage onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
+            {activeMiniGame === 'aquifer' && <AquiferDefense onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
+            {activeMiniGame === 'evaporation' && <EvaporationRace onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
+            {activeMiniGame === 'aturemPlater' && <AturemPlater onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
+          </Suspense>
         </div>
       )}
 
@@ -899,6 +919,7 @@ function App() {
               loop
               controls
               playsInline
+              preload="metadata"
               style={{ width: '100%', maxHeight: '250px', objectFit: 'cover', borderRadius: '16px', marginBottom: '1.2rem', boxShadow: '0 8px 24px rgba(0,0,0,0.5)', border: '1px solid rgba(16, 185, 129, 0.4)' }}
             />
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '6px 16px', borderRadius: '20px', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#10b981', fontWeight: 800, fontSize: '0.85rem', marginBottom: '0.8rem', textTransform: 'uppercase', letterSpacing: '1px' }}>

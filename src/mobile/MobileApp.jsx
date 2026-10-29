@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { Target, Activity, Settings, Map as MapIcon, ShieldAlert, MapPin, BarChart2, Compass, Award, BookOpen } from 'lucide-react';
 import MobileGameMap from './MobileGameMap';
 
-// Minigames
-import ConnectTheDots from '../components/minigames/ConnectTheDots';
-import MobileSliderBalance from './minigames/MobileSliderBalance';
-import MobileHeatPumpHarmony from './minigames/MobileHeatPumpHarmony';
-import MobileHeatHazeSabotage from './minigames/MobileHeatHazeSabotage';
-import MobileAquiferDefense from './minigames/MobileAquiferDefense';
-import MobileEvaporationRace from './minigames/MobileEvaporationRace';
-import MobileAturemPlater from './minigames/MobileAturemPlater';
-import RhythmGame from '../components/minigames/RhythmGame';
-import CommunityEnergy from '../components/minigames/CommunityEnergy';
-import MobilePavelloTycoon from './minigames/MobilePavelloTycoon';
-import QuizSobirania from '../components/minigames/QuizSobirania';
-import BalanceEnergetic from '../components/minigames/BalanceEnergetic';
+// Lazy Loaded Minigames for Mobile
+const ConnectTheDots = lazy(() => import('../components/minigames/ConnectTheDots'));
+const MobileSliderBalance = lazy(() => import('./minigames/MobileSliderBalance'));
+const MobileHeatPumpHarmony = lazy(() => import('./minigames/MobileHeatPumpHarmony'));
+const MobileHeatHazeSabotage = lazy(() => import('./minigames/MobileHeatHazeSabotage'));
+const MobileAquiferDefense = lazy(() => import('./minigames/MobileAquiferDefense'));
+const MobileEvaporationRace = lazy(() => import('./minigames/MobileEvaporationRace'));
+const MobileAturemPlater = lazy(() => import('./minigames/MobileAturemPlater'));
+const RhythmGame = lazy(() => import('../components/minigames/RhythmGame'));
+const CommunityEnergy = lazy(() => import('../components/minigames/CommunityEnergy'));
+const MobilePavelloTycoon = lazy(() => import('./minigames/MobilePavelloTycoon'));
+const QuizSobirania = lazy(() => import('../components/minigames/QuizSobirania'));
+const BalanceEnergetic = lazy(() => import('../components/minigames/BalanceEnergetic'));
 
 import CinematicOverlay from '../components/CinematicOverlay';
 import MusicPlayer from '../components/MusicPlayer';
@@ -75,6 +75,7 @@ const MobileApp = (props) => {
     }).length;
     const canAturarPlater = liberatedRooftopsCount >= Math.ceil(totalRooftopNodes * 0.85) && liberatedNodes.has('sala_nova_001') && liberatedNodes.has('pavello_001');
     const stats = calculateStats(liberatedNodes);
+    const currentMoney = stats?.currentMoney || 0;
 
     return (
         <div className="mobile-app-container" style={{ display: 'flex', flexDirection: 'column', height: '100dvh', width: '100vw', overflow: 'hidden', backgroundColor: '#f8fafc' }}>
@@ -293,8 +294,20 @@ const MobileApp = (props) => {
             )}
 
             {showVictoryModal && (
-                <div className="modal-overlay" style={{ padding: '16px', zIndex: 100000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <div className="modal-content victory" style={{ width: '100%', maxWidth: '420px', maxHeight: '90vh', overflowY: 'auto', textAlign: 'center', padding: '20px', borderRadius: '20px', border: '2px solid rgba(16, 185, 129, 0.6)' }}>
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100dvh',
+                    backgroundColor: 'rgba(2, 6, 23, 0.92)', zIndex: 120000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
+                    backdropFilter: 'blur(8px)'
+                }}>
+                    <div style={{
+                        background: '#0f172a',
+                        width: '100%', maxWidth: '420px', maxHeight: '92dvh', overflowY: 'auto',
+                        textAlign: 'center', padding: '22px 18px', borderRadius: '20px',
+                        border: '2px solid rgba(16, 185, 129, 0.6)',
+                        boxShadow: '0 25px 60px rgba(0,0,0,0.95), 0 0 35px rgba(16, 185, 129, 0.2)',
+                        color: '#ffffff'
+                    }}>
                         <video
                             src="/cinematics/ffinal.mp4"
                             poster="/cinematics/celdoni_victory_epic.png"
@@ -302,35 +315,36 @@ const MobileApp = (props) => {
                             loop
                             controls
                             playsInline
-                            style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '14px', marginBottom: '12px', border: '1px solid rgba(16, 185, 129, 0.4)' }}
+                            preload="metadata"
+                            style={{ width: '100%', maxHeight: '180px', objectFit: 'cover', borderRadius: '14px', marginBottom: '14px', border: '1px solid rgba(16, 185, 129, 0.4)', backgroundColor: '#000' }}
                         />
                         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.15)', border: '1px solid #10b981', color: '#10b981', fontWeight: 800, fontSize: '0.75rem', marginBottom: '8px', textTransform: 'uppercase' }}>
                             🏆 Victòria Comunitària Total
                         </div>
                         <h2 style={{ color: '#10b981', margin: '0 0 8px 0', fontSize: '1.6rem', fontWeight: 900 }}>La Llera és Viva!</h2>
-                        <p style={{ margin: '0 0 16px 0', fontSize: '0.9rem', color: '#475569', lineHeight: 1.5 }}>
+                        <p style={{ margin: '0 0 16px 0', fontSize: '0.92rem', color: '#e2e8f0', lineHeight: 1.5, fontWeight: 500 }}>
                             Has aturat el macroprojecte especulatiu del Plater i alliberat totes les teulades! El Ter, els boscos i els camps estan salvats.
                         </p>
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '16px' }}>
-                            <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ background: '#1e293b', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
                                 <div style={{ fontSize: '1.2rem' }}>⚡</div>
-                                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Teulades</div>
+                                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Teulades</div>
                                 <div style={{ fontWeight: 800, color: '#10b981', fontSize: '0.9rem' }}>{liberatedRooftopsCount}/{totalRooftopNodes}</div>
                             </div>
-                            <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ background: '#1e293b', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
                                 <div style={{ fontSize: '1.2rem' }}>🛡️</div>
-                                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Homes de Negre</div>
+                                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Homes de Negre</div>
                                 <div style={{ fontWeight: 800, color: '#10b981', fontSize: '0.9rem' }}>Foragitats</div>
                             </div>
-                            <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ background: '#1e293b', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
                                 <div style={{ fontSize: '1.2rem' }}>🌳</div>
-                                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>El Plater</div>
+                                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>El Plater</div>
                                 <div style={{ fontWeight: 800, color: '#10b981', fontSize: '0.9rem' }}>Salvat</div>
                             </div>
-                            <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
+                            <div style={{ background: '#1e293b', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.1)' }}>
                                 <div style={{ fontSize: '1.2rem' }}>💶</div>
-                                <div style={{ fontSize: '0.72rem', color: '#64748b' }}>Estalvi</div>
+                                <div style={{ fontSize: '0.72rem', color: '#94a3b8' }}>Estalvi</div>
                                 <div style={{ fontWeight: 800, color: '#f59e0b', fontSize: '0.9rem' }}>{Math.round(currentMoney).toLocaleString()}€</div>
                             </div>
                         </div>
@@ -349,8 +363,8 @@ const MobileApp = (props) => {
                             <button
                                 onClick={onResetGame}
                                 style={{
-                                    width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid #cbd5e1',
-                                    backgroundColor: 'transparent', color: '#64748b', fontWeight: '600', fontSize: '0.85rem',
+                                    width: '100%', padding: '10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.2)',
+                                    backgroundColor: 'transparent', color: '#cbd5e1', fontWeight: '600', fontSize: '0.85rem',
                                     cursor: 'pointer'
                                 }}
                             >
@@ -364,18 +378,25 @@ const MobileApp = (props) => {
             {/* MINIGAMES LAYER */}
             {activeMiniGame && (
                 <div style={{ position: 'fixed', top: 0, left: 0, width: 0, height: 0, zIndex: 100000, pointerEvents: 'none' }}>
-                    {activeMiniGame === 'connect' && <ConnectTheDots onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
-                    {activeMiniGame === 'slider' && <MobileSliderBalance onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-                    {activeMiniGame === 'heatPump' && <MobileHeatPumpHarmony onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
-                    {activeMiniGame === 'rhythm' && <RhythmGame onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-                    {activeMiniGame === 'community' && <CommunityEnergy onComplete={(reward) => completeLiberation(pendingNode?.id, reward)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={20} backgroundOverride={pendingNode?.id === 'sala_nova_001' ? salaNovaBg : null} />}
-                    {activeMiniGame === 'tycoon' && <MobilePavelloTycoon onComplete={(reward) => completeLiberation(pendingNode?.id, reward || 70)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={70} />}
-                    {activeMiniGame === 'quiz' && <QuizSobirania onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-                    {activeMiniGame === 'balance' && <BalanceEnergetic onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-                    {activeMiniGame === 'heatHaze' && <MobileHeatHazeSabotage onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
-                    {activeMiniGame === 'aquifer' && <MobileAquiferDefense onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-                    {activeMiniGame === 'evaporation' && <MobileEvaporationRace onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-                    {activeMiniGame === 'aturemPlater' && <MobileAturemPlater onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
+                    <Suspense fallback={
+                        <div className="minigame-overlay" style={{ display: 'flex', flexDirection: 'column', gap: '12px', color: '#ffffff' }}>
+                            <div style={{ width: '40px', height: '40px', border: '4px solid #10b981', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+                            <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>Carregant minijoc...</span>
+                        </div>
+                    }>
+                        {activeMiniGame === 'connect' && <ConnectTheDots onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
+                        {activeMiniGame === 'slider' && <MobileSliderBalance onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+                        {activeMiniGame === 'heatPump' && <MobileHeatPumpHarmony onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
+                        {activeMiniGame === 'rhythm' && <RhythmGame onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+                        {activeMiniGame === 'community' && <CommunityEnergy onComplete={(reward) => completeLiberation(pendingNode?.id, reward)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={20} backgroundOverride={pendingNode?.id === 'sala_nova_001' ? salaNovaBg : null} />}
+                        {activeMiniGame === 'tycoon' && <MobilePavelloTycoon onComplete={(reward) => completeLiberation(pendingNode?.id, reward || 70)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={70} />}
+                        {activeMiniGame === 'quiz' && <QuizSobirania onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+                        {activeMiniGame === 'balance' && <BalanceEnergetic onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+                        {activeMiniGame === 'heatHaze' && <MobileHeatHazeSabotage onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
+                        {activeMiniGame === 'aquifer' && <MobileAquiferDefense onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
+                        {activeMiniGame === 'evaporation' && <MobileEvaporationRace onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
+                        {activeMiniGame === 'aturemPlater' && <MobileAturemPlater onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
+                    </Suspense>
                 </div>
             )}
 

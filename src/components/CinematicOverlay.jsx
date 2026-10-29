@@ -34,6 +34,7 @@ const CinematicOverlay = ({ phase, onComplete }) => {
                     controls
                     autoPlay
                     playsInline
+                    preload="metadata"
                     style={{
                         width: '100%',
                         maxHeight: '82vh',

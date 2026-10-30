@@ -454,15 +454,12 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                     0% { transform: scale(1.05) rotate(-6deg); }
                     100% { transform: scale(1.18) rotate(6deg); }
                 }
-                /* Resplendor i augment suau en passar el ratolí per sobre les teulades */
-                .pending-roof-icon, .liberated-roof-icon, .sala-nova-icon, .pavello-icon {
-                    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease-out !important;
+                /* Feedback suau de brillantor en passar el ratolí, sense cap moviment ni desplaçament */
+                .pending-roof-icon > div, .liberated-roof-icon > div, .sala-nova-icon > div, .pavello-icon > div {
+                    transition: filter 0.2s ease-out;
                 }
-                .pending-roof-icon:hover, .liberated-roof-icon:hover, .sala-nova-icon:hover, .pavello-icon:hover {
-                    transform: scale(1.24) !important;
-                    filter: drop-shadow(0 0 16px #fbbf24) brightness(1.12) !important;
-                    z-index: 10000 !important;
-                    cursor: pointer !important;
+                .pending-roof-icon:hover > div, .liberated-roof-icon:hover > div, .sala-nova-icon:hover > div, .pavello-icon:hover > div {
+                    filter: drop-shadow(0 0 10px #fbbf24) brightness(1.15);
                 }
             `}</style>
 

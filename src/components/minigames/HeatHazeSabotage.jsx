@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactDOM from 'react-dom';
+import '../../App.css';
 import { CheckCircle, Wind, X } from 'lucide-react';
 import { minigameAssets } from '../../data/minigame_assets';
 
@@ -303,7 +304,7 @@ const HeatHazeSabotage = ({ onComplete, onClose, onImpact }) => {
     };
 
     return ReactDOM.createPortal(
-        <div className="minigame-overlay">
+        <div className="minigame-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', backgroundColor: 'rgba(2, 6, 23, 0.88)', zIndex: 100000, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
             <div className="minigame-card scale-up-center" style={{
                 width: 'min(980px, 98vw)', padding: 0, overflow: 'hidden',
                 backgroundColor: '#111', border: '2px solid #c9a84c'

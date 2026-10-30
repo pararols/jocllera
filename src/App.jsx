@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import './App.css';
 import { Network, Battery, Activity, Zap, ShieldAlert, Radio, AlertTriangle, Compass, Award, BookOpen } from 'lucide-react';
 import GameMap from './components/GameMap';
 import CinematicOverlay from './components/CinematicOverlay';

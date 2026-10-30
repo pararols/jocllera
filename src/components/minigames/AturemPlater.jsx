@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom';
+import '../../App.css';
 import { 
     Shield, CheckCircle, RotateCcw, Layers, Eye, EyeOff, 
     Plus, Minus, Compass, Hand, Paintbrush,
@@ -691,7 +692,7 @@ const AturemPlater = ({ onComplete, onClose }) => {
     };
 
     return ReactDOM.createPortal(
-        <div className="minigame-overlay" style={{ zIndex: 10000 }}>
+        <div className="minigame-overlay" style={{ zIndex: 100000 }}>
             <div className="minigame-card scale-up-center" style={{
                 width: 'min(1100px, 98vw)', padding: 0, overflow: 'hidden',
                 backgroundColor: '#0f172a', border: '2px solid #10b981',

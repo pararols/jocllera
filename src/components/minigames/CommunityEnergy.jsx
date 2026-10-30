@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
+import '../../App.css';
 import { Users, AlertTriangle, Clock, CheckCircle } from 'lucide-react';
 import SoundManager from '../../logic/SoundManager';
 
@@ -238,7 +239,7 @@ const CommunityEnergy = ({ onComplete, onClose, maxPower, rewardFactor, backgrou
     };
 
     return ReactDOM.createPortal(
-        <div className="minigame-overlay" style={{ zIndex: 10000 }}>
+        <div className="minigame-overlay" style={{ zIndex: 100000 }}>
             <div className="minigame-card scale-up-center" style={{ width: '88%', height: '88%', maxWidth: '1050px', padding: 0, overflow: 'hidden', position: 'relative', borderRadius: '16px' }}>
                 {/* Header */}
                 <div className="minigame-header" style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(8px)', padding: '12px 24px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>

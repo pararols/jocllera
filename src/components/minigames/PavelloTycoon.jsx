@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import '../../App.css';
 import { Building2, Users, Coins, MessageSquare, Megaphone, Newspaper, Mail, Users2, CheckCircle, XCircle, Info, Sparkles, TrendingUp } from 'lucide-react';
 
 const marketingIcon = '/assets/expert_marketing.png';
@@ -151,9 +152,9 @@ const PavelloTycoon = ({ onComplete, onClose, maxPower, rewardFactor }) => {
     };
 
     return ReactDOM.createPortal(
-        <div className="tycoon-overlay" style={{
+        <div className="tycoon-overlay minigame-overlay" style={{
             position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-            background: 'rgba(0,0,0,0.85)', zIndex: 10000, display: 'flex', justifyContent: 'center', alignItems: 'center'
+            background: 'rgba(0,0,0,0.85)', zIndex: 100000, display: 'flex', justifyContent: 'center', alignItems: 'center'
         }}>
             <div className="tycoon-card" style={{
                 width: '95%', height: '95%', maxWidth: '1200px', background: '#f5f6fa',

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
+import '../../App.css';
 import Phaser from 'phaser';
 import SoundManager from '../../logic/SoundManager';
 
@@ -420,14 +421,14 @@ const QuizSobirania = ({ onComplete, onClose }) => {
     }, []);
 
     return ReactDOM.createPortal(
-        <div style={{
+        <div className="minigame-overlay" style={{
             position: 'fixed',
             top: 0,
             left: 0,
             width: '100vw',
             height: '100vh',
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            zIndex: 10000,
+            zIndex: 100000,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',

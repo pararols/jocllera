@@ -382,7 +382,7 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
     const lastInteractionRef = React.useRef(0);
     const handleLiberateAttempt = (inst, latlng, containerPoint) => {
         const now = Date.now();
-        if (now - lastInteractionRef.current < 400) return;
+        if (now - lastInteractionRef.current < 200) return;
         lastInteractionRef.current = now;
 
         // If an enemy is currently attacking this rooftop, expelling the enemy happens IMMEDIATELY,
@@ -403,7 +403,7 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
     const handleMapClickRoof = (latlng, containerPoint) => {
         if (isEditorMode) return;
         const now = Date.now();
-        if (now - lastInteractionRef.current < 400) return;
+        if (now - lastInteractionRef.current < 200) return;
 
         // Check if user clicked anywhere on or near a rooftop building (within 85m)
         let closest = null;

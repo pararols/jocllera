@@ -92,7 +92,7 @@ const getSuitIcon = (isAttacking) => isAttacking ? suitAttackingIcon : suitWalki
 const liberatedRooftopIcon = (power, id) => new L.divIcon({
     className: 'liberated-roof-icon',
     html: `
-        <div style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
             <div style="
                 background: linear-gradient(135deg, #10b981 0%, #059669 100%);
                 border: 2.5px solid #ffffff;
@@ -133,7 +133,7 @@ const liberatedRooftopIcon = (power, id) => new L.divIcon({
 const pendingRooftopIcon = (power, id) => new L.divIcon({
     className: 'pending-roof-icon',
     html: `
-        <div style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
             <div style="
                 background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
                 border: 2.5px solid #cbd5e1;
@@ -174,7 +174,7 @@ const pendingRooftopIcon = (power, id) => new L.divIcon({
 const getSalaNovaIcon = (isLiberated) => new L.divIcon({
     className: 'sala-nova-icon',
     html: `
-        <div style="
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('sala_nova_001');}" style="
             background: ${isLiberated ? 'linear-gradient(135deg, #10b981, #047857)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'};
             border: 3px solid ${isLiberated ? '#facc15' : '#ffffff'};
             border-radius: 50%;
@@ -212,7 +212,7 @@ const getSalaNovaIcon = (isLiberated) => new L.divIcon({
 const getPavelloIcon = (isLiberated) => new L.divIcon({
     className: 'pavello-icon',
     html: `
-        <div style="
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('pavello_001');}" style="
             background: ${isLiberated ? 'linear-gradient(135deg, #f59e0b, #b45309)' : 'linear-gradient(135deg, #8b5cf6, #6d28d9)'};
             border: 3px solid ${isLiberated ? '#10b981' : '#ffffff'};
             border-radius: 50%;
@@ -284,8 +284,15 @@ const getBadIcon = (type) => {
     return icon;
 };
 
-const MapEventListener = ({ lastDamageEvent, addDamageText }) => {
+const MapEventListener = ({ lastDamageEvent, addDamageText, onMapClickRoof }) => {
     const map = useMap();
+    useMapEvents({
+        click: (e) => {
+            if (onMapClickRoof) {
+                onMapClickRoof(e.latlng, e.containerPoint);
+            }
+        }
+    });
     React.useEffect(() => {
         if (lastDamageEvent) {
             const pt = map.latLngToContainerPoint([lastDamageEvent.lat, lastDamageEvent.lng]);
@@ -375,6 +382,41 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
         onLiberateNode(inst.id, inst.power, inst.owner, latlng, containerPoint);
     };
 
+    const handleMapClickRoof = (latlng, containerPoint) => {
+        if (isEditorMode) return;
+        const now = Date.now();
+        if (now - lastInteractionRef.current < 400) return;
+
+        // Check if user clicked anywhere on or near a rooftop building (within 85m)
+        let closest = null;
+        let minDist = 85;
+        gisData.installations.forEach(inst => {
+            if (inst.type !== 'rooftop' && inst.type !== 'pavello' && inst.type !== 'sala_nova') return;
+            const dLat = (inst.coordinates[0] - latlng.lat) * 111072;
+            const dLng = (inst.coordinates[1] - latlng.lng) * 82660;
+            const dist = Math.hypot(dLat, dLng);
+            if (dist < minDist) {
+                minDist = dist;
+                closest = inst;
+            }
+        });
+        if (closest) {
+            handleLiberateAttempt(closest, latlng, containerPoint);
+        }
+    };
+
+    React.useEffect(() => {
+        window.__triggerRooftop = (id) => {
+            const inst = gisData.installations.find(i => i.id === id);
+            if (inst) {
+                handleLiberateAttempt(inst);
+            }
+        };
+        return () => {
+            delete window.__triggerRooftop;
+        };
+    }, [enemies, onEnemyClick, onLiberateNode]);
+
     React.useEffect(() => {
         if (lastInteraction && liberatedNodes && liberatedNodes.has(lastInteraction.id) && !lastInteraction.played) {
             triggerFeedback(lastInteraction.power, { x: lastInteraction.x, y: lastInteraction.y - 40 });
@@ -402,7 +444,7 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                 style={{ height: '100%', width: '100%' }}
                 zoomControl={false}
             >
-                <MapEventListener lastDamageEvent={lastDamageEvent} addDamageText={addDamageText} />
+                <MapEventListener lastDamageEvent={lastDamageEvent} addDamageText={addDamageText} onMapClickRoof={handleMapClickRoof} />
 
                 {/* Vista Satèl·lit / Ortofoto Oficial ICGC */}
                 <TileLayer

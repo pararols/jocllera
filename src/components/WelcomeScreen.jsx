@@ -91,6 +91,31 @@ const WelcomeScreen = ({ onStart, onReset, savedProgressCount = 0 }) => {
                     color: '#ffffff'
                 }}
             >
+                <button
+                    onClick={onStart}
+                    style={{
+                        position: 'absolute',
+                        top: '14px',
+                        right: '14px',
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        color: '#cbd5e1',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        width: '32px',
+                        height: '32px',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'background 0.2s'
+                    }}
+                    title="Saltar intro i anar al mapa"
+                >
+                    ✕
+                </button>
+
                 <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem', animation: 'fadeIn 0.4s ease-out' }}>
                     {currentStep.icon}
                 </div>
@@ -315,7 +340,7 @@ const WelcomeScreen = ({ onStart, onReset, savedProgressCount = 0 }) => {
                     </div>
                 </div>
 
-                <div style={{ marginTop: '1.4rem', borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '0.9rem' }}>
+                <div style={{ marginTop: '1.4rem', borderTop: '1px solid rgba(255,255,255,0.12)', paddingTop: '0.9rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                     <button
                         onClick={() => setShowRulesModal(true)}
                         style={{
@@ -330,7 +355,20 @@ const WelcomeScreen = ({ onStart, onReset, savedProgressCount = 0 }) => {
                             fontWeight: 700
                         }}
                     >
-                        <BookOpen size={16} /> 📜 Veure totes les regles detallades
+                        <BookOpen size={16} /> 📜 Veure totes les regles
+                    </button>
+                    <button
+                        onClick={onStart}
+                        style={{
+                            background: 'none',
+                            border: 'none',
+                            color: '#94a3b8',
+                            cursor: 'pointer',
+                            fontSize: '0.85rem',
+                            textDecoration: 'underline'
+                        }}
+                    >
+                        Saltar intro i jugar ara →
                     </button>
                 </div>
             </div>

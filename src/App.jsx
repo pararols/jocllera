@@ -290,6 +290,27 @@ function App() {
     }
   }, [isThreatNeutralized]);
 
+  // Tecla Escape per tancar ràpidament qualsevol minijoc o modal obert (Escriptori)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (activeMiniGame) {
+          SoundManager.playSFX('click');
+          setActiveMiniGame(null);
+          setPendingNode(null);
+        } else if (showRules) {
+          setShowRules(false);
+        } else if (showBadges) {
+          setShowBadges(false);
+        } else if (showCinematic) {
+          setShowCinematic(false);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeMiniGame, showRules, showBadges, showCinematic]);
+
   // ENEMY LOOP (HOMES DE NEGRE)
   useEffect(() => {
     // Si s'han alliberat totes les teulades o l'amenaça és 0, atura completament els homes de negre i neteja el mapa

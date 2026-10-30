@@ -291,6 +291,24 @@ const MapEventListener = ({ lastDamageEvent, addDamageText, onMapClickRoof }) =>
             if (onMapClickRoof) {
                 onMapClickRoof(e.latlng, e.containerPoint);
             }
+        },
+        mousemove: (e) => {
+            // Canvia el cursor a pointer quan passa a prop (<85m) d'una teulada
+            let isNear = false;
+            for (let i = 0; i < gisData.installations.length; i++) {
+                const inst = gisData.installations[i];
+                if (inst.type !== 'rooftop' && inst.type !== 'pavello' && inst.type !== 'sala_nova') continue;
+                const dLat = (inst.coordinates[0] - e.latlng.lat) * 111072;
+                const dLng = (inst.coordinates[1] - e.latlng.lng) * 82660;
+                if (Math.hypot(dLat, dLng) < 85) {
+                    isNear = true;
+                    break;
+                }
+            }
+            const container = map.getContainer();
+            if (container) {
+                container.style.cursor = isNear ? 'pointer' : '';
+            }
         }
     });
     React.useEffect(() => {
@@ -436,11 +454,22 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                     0% { transform: scale(1.05) rotate(-6deg); }
                     100% { transform: scale(1.18) rotate(6deg); }
                 }
+                /* Resplendor i augment suau en passar el ratolí per sobre les teulades */
+                .pending-roof-icon, .liberated-roof-icon, .sala-nova-icon, .pavello-icon {
+                    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease-out !important;
+                }
+                .pending-roof-icon:hover, .liberated-roof-icon:hover, .sala-nova-icon:hover, .pavello-icon:hover {
+                    transform: scale(1.24) !important;
+                    filter: drop-shadow(0 0 16px #fbbf24) brightness(1.12) !important;
+                    z-index: 10000 !important;
+                    cursor: pointer !important;
+                }
             `}</style>
 
             <MapContainer
                 center={position}
-                zoom={15}
+                zoom={16}
+                zoomSnap={0.5}
                 style={{ height: '100%', width: '100%' }}
                 zoomControl={false}
             >

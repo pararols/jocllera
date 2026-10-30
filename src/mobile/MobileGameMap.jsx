@@ -330,7 +330,8 @@ const MobileGameMap = ({
     contagionWave,
     nodePowers
 }) => {
-    const position = gisData.center;
+    // Centratge òptic adaptat per a pantalla mòbil (compensa la barra superior i inferior)
+    const position = [gisData.center[0] - 0.0010, gisData.center[1] - 0.0016];
     const [feedbackItems, setFeedbackItems] = React.useState([]);
     const [selectedNode, setSelectedNode] = React.useState(null);
     const [lastInteraction, setLastInteraction] = React.useState(null);
@@ -459,7 +460,8 @@ const MobileGameMap = ({
             <div style={{ height: '100%', width: '100%', position: 'relative' }}>
                 <MapContainer
                     center={position}
-                    zoom={15}
+                    zoom={16}
+                    zoomSnap={0.5}
                     style={{ height: '100%', width: '100%' }}
                     zoomControl={false}
                 >

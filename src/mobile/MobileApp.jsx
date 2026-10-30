@@ -1,6 +1,7 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Target, Activity, Settings, Map as MapIcon, ShieldAlert, MapPin, BarChart2, Compass, Award, BookOpen } from 'lucide-react';
 import MobileGameMap from './MobileGameMap';
+import SoundManager from '../logic/SoundManager';
 
 // Lazy Loaded Minigames for Mobile
 const ConnectTheDots = lazy(() => import('../components/minigames/ConnectTheDots'));
@@ -76,6 +77,27 @@ const MobileApp = (props) => {
     const canAturarPlater = liberatedRooftopsCount >= Math.ceil(totalRooftopNodes * 0.85) && liberatedNodes.has('sala_nova_001') && liberatedNodes.has('pavello_001');
     const stats = calculateStats(liberatedNodes);
     const currentMoney = stats?.currentMoney || 0;
+
+    // Tecla Escape per tancar minijocs i modals si es juga amb teclat / tauleta
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                if (activeMiniGame) {
+                    SoundManager.playSFX('click');
+                    setActiveMiniGame(null);
+                    setPendingNode(null);
+                } else if (showRules) {
+                    setShowRules(false);
+                } else if (showBadges) {
+                    setShowBadges(false);
+                } else if (showCinematic) {
+                    setShowCinematic(false);
+                }
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [activeMiniGame, showRules, showBadges, showCinematic]);
 
     return (
         <div className="mobile-app-container" style={{ display: 'flex', flexDirection: 'column', height: '100dvh', width: '100vw', overflow: 'hidden', backgroundColor: '#f8fafc' }}>

@@ -463,18 +463,18 @@ const MobileApp = (props) => {
                             <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>Carregant minijoc...</span>
                         </div>
                     }>
-                        {activeMiniGame === 'connect' && <ConnectTheDots onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
-                        {activeMiniGame === 'slider' && <MobileSliderBalance onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-                        {activeMiniGame === 'heatPump' && <MobileHeatPumpHarmony onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
-                        {activeMiniGame === 'rhythm' && <RhythmGame onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-                        {activeMiniGame === 'community' && <CommunityEnergy onComplete={(reward) => completeLiberation(pendingNode?.id, reward)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={20} backgroundOverride={pendingNode?.id === 'sala_nova_001' ? salaNovaBg : null} />}
-                        {activeMiniGame === 'tycoon' && <MobilePavelloTycoon onComplete={(reward) => completeLiberation(pendingNode?.id, reward || 70)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={70} />}
-                        {activeMiniGame === 'quiz' && <QuizSobirania onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-                        {activeMiniGame === 'balance' && <BalanceEnergetic onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-                        {activeMiniGame === 'heatHaze' && <MobileHeatHazeSabotage onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
-                        {activeMiniGame === 'aquifer' && <MobileAquiferDefense onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-                        {activeMiniGame === 'evaporation' && <MobileEvaporationRace onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-                        {activeMiniGame === 'aturemPlater' && <MobileAturemPlater onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
+                        {activeMiniGame === 'connect' && <ConnectTheDots key={pendingNode?.id || 'connect'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
+                        {activeMiniGame === 'slider' && <MobileSliderBalance key={pendingNode?.id || 'slider'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+                        {activeMiniGame === 'heatPump' && <MobileHeatPumpHarmony key={pendingNode?.id || 'heatPump'} onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
+                        {activeMiniGame === 'rhythm' && <RhythmGame key={pendingNode?.id || 'rhythm'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+                        {activeMiniGame === 'community' && <CommunityEnergy key={pendingNode?.id || 'community'} onComplete={(reward) => completeLiberation(pendingNode?.id, reward)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={20} backgroundOverride={pendingNode?.id === 'sala_nova_001' ? salaNovaBg : null} />}
+                        {activeMiniGame === 'tycoon' && <MobilePavelloTycoon key={pendingNode?.id || 'tycoon'} onComplete={(reward) => completeLiberation(pendingNode?.id, reward || 70)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={70} />}
+                        {activeMiniGame === 'quiz' && <QuizSobirania key={pendingNode?.id || 'quiz'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+                        {activeMiniGame === 'balance' && <BalanceEnergetic key={pendingNode?.id || 'balance'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+                        {activeMiniGame === 'heatHaze' && <MobileHeatHazeSabotage key={pendingNode?.id || 'heatHaze'} onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
+                        {activeMiniGame === 'aquifer' && <MobileAquiferDefense key={pendingNode?.id || 'aquifer'} onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
+                        {activeMiniGame === 'evaporation' && <MobileEvaporationRace key={pendingNode?.id || 'evaporation'} onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
+                        {activeMiniGame === 'aturemPlater' && <MobileAturemPlater key="aturemPlater" onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
                     </Suspense>
                 </div>
             )}

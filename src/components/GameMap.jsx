@@ -92,7 +92,7 @@ const getSuitIcon = (isAttacking) => isAttacking ? suitAttackingIcon : suitWalki
 const liberatedRooftopIcon = (power, id) => new L.divIcon({
     className: 'liberated-roof-icon',
     html: `
-        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
+        <div onclick="event.stopPropagation(); if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
             <div style="
                 background: linear-gradient(135deg, #10b981 0%, #059669 100%);
                 border: 2.5px solid #ffffff;
@@ -133,7 +133,7 @@ const liberatedRooftopIcon = (power, id) => new L.divIcon({
 const pendingRooftopIcon = (power, id) => new L.divIcon({
     className: 'pending-roof-icon',
     html: `
-        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
+        <div onclick="event.stopPropagation(); if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
             <div style="
                 background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
                 border: 2.5px solid #cbd5e1;
@@ -174,7 +174,7 @@ const pendingRooftopIcon = (power, id) => new L.divIcon({
 const getSalaNovaIcon = (isLiberated) => new L.divIcon({
     className: 'sala-nova-icon',
     html: `
-        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('sala_nova_001');}" style="
+        <div onclick="event.stopPropagation(); if(window.__triggerRooftop){window.__triggerRooftop('sala_nova_001');}" style="
             background: ${isLiberated ? 'linear-gradient(135deg, #10b981, #047857)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'};
             border: 3px solid ${isLiberated ? '#facc15' : '#ffffff'};
             border-radius: 50%;
@@ -212,7 +212,7 @@ const getSalaNovaIcon = (isLiberated) => new L.divIcon({
 const getPavelloIcon = (isLiberated) => new L.divIcon({
     className: 'pavello-icon',
     html: `
-        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('pavello_001');}" style="
+        <div onclick="event.stopPropagation(); if(window.__triggerRooftop){window.__triggerRooftop('pavello_001');}" style="
             background: ${isLiberated ? 'linear-gradient(135deg, #f59e0b, #b45309)' : 'linear-gradient(135deg, #8b5cf6, #6d28d9)'};
             border: 3px solid ${isLiberated ? '#10b981' : '#ffffff'};
             border-radius: 50%;
@@ -293,14 +293,14 @@ const MapEventListener = ({ lastDamageEvent, addDamageText, onMapClickRoof }) =>
             }
         },
         mousemove: (e) => {
-            // Canvia el cursor a pointer quan passa a prop (<85m) d'una teulada
+            // Canvia el cursor a pointer quan passa a prop (<130m) d'una teulada
             let isNear = false;
             for (let i = 0; i < gisData.installations.length; i++) {
                 const inst = gisData.installations[i];
                 if (inst.type !== 'rooftop' && inst.type !== 'pavello' && inst.type !== 'sala_nova') continue;
                 const dLat = (inst.coordinates[0] - e.latlng.lat) * 111072;
                 const dLng = (inst.coordinates[1] - e.latlng.lng) * 82660;
-                if (Math.hypot(dLat, dLng) < 85) {
+                if (Math.hypot(dLat, dLng) < 130) {
                     isNear = true;
                     break;
                 }
@@ -405,9 +405,9 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
         const now = Date.now();
         if (now - lastInteractionRef.current < 200) return;
 
-        // Check if user clicked anywhere on or near a rooftop building (within 85m)
+        // Check if user clicked anywhere on or near a rooftop building (within 130m)
         let closest = null;
-        let minDist = 85;
+        let minDist = 130;
         gisData.installations.forEach(inst => {
             if (inst.type !== 'rooftop' && inst.type !== 'pavello' && inst.type !== 'sala_nova') return;
             const dLat = (inst.coordinates[0] - latlng.lat) * 111072;
@@ -453,6 +453,13 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                 @keyframes sabotageShake {
                     0% { transform: scale(1.05) rotate(-6deg); }
                     100% { transform: scale(1.18) rotate(6deg); }
+                }
+                .pending-roof-icon, .liberated-roof-icon, .sala-nova-icon, .pavello-icon {
+                    cursor: pointer !important;
+                }
+                .pending-roof-icon:hover, .liberated-roof-icon:hover, .sala-nova-icon:hover, .pavello-icon:hover {
+                    z-index: 10000 !important;
+                    cursor: pointer !important;
                 }
                 /* Feedback suau de brillantor en passar el ratolí, sense cap moviment ni desplaçament */
                 .pending-roof-icon > div, .liberated-roof-icon > div, .sala-nova-icon > div, .pavello-icon > div {
@@ -573,49 +580,7 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                                     handleLiberateAttempt(inst, e.latlng, e.containerPoint);
                                 }
                             }}
-                        >
-                            <Popup
-                                offset={[0, -20]}
-                                closeButton={true}
-                                autoPan={false}
-                                className="rooftop-map-popup"
-                            >
-                                <div style={{ textAlign: 'center', fontFamily: 'var(--font-main)', padding: '2px 4px', userSelect: 'none' }}>
-                                    <div style={{ fontWeight: 800, fontSize: '14px', color: '#f8fafc', marginBottom: '2px' }}>
-                                        {inst.owner}
-                                    </div>
-                                    <div style={{ color: attackingEnemy ? '#ef4444' : (isLiberated ? '#10b981' : '#f59e0b'), fontWeight: 'bold', fontSize: '12px', marginBottom: '8px' }}>
-                                        {attackingEnemy ? '🚨 SOTA ATAC DE HOMES DE NEGRE!' : (isLiberated ? `⚡ Alliberada (${currentPower.toFixed(1)} kW)` : `🎮 ${getMinigameName(inst)} (${currentPower.toFixed(1)} kW)`)}
-                                    </div>
-                                    <button
-                                        type="button"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleLiberateAttempt(inst);
-                                            const closeBtn = e.target.closest?.('.leaflet-popup')?.querySelector('.leaflet-popup-close-button');
-                                            if (closeBtn) closeBtn.click();
-                                        }}
-                                        style={{
-                                            background: attackingEnemy ? 'linear-gradient(135deg, #ef4444, #b91c1c)' : (isLiberated ? 'linear-gradient(135deg, #3b82f6, #1d4ed8)' : 'linear-gradient(135deg, #10b981, #059669)'),
-                                            color: '#ffffff',
-                                            border: 'none',
-                                            borderRadius: '8px',
-                                            padding: '8px 18px',
-                                            fontSize: '12px',
-                                            fontWeight: 800,
-                                            cursor: 'pointer',
-                                            display: 'inline-flex',
-                                            alignItems: 'center',
-                                            gap: '6px',
-                                            boxShadow: '0 3px 8px rgba(0,0,0,0.3)',
-                                            transition: 'transform 0.1s'
-                                        }}
-                                    >
-                                        <Play size={14} fill="#ffffff" /> {attackingEnemy ? '🛡️ EXPULSAR I JUGAR' : (isLiberated ? 'REJUGAR MINIJOC' : 'JUGAR ARA')}
-                                    </button>
-                                </div>
-                            </Popup>
-                        </Marker>
+                        />
                     );
                 })}
 

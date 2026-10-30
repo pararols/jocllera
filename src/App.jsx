@@ -878,25 +878,25 @@ function App() {
 
       {/* MINIGAMES OVERLAYS */}
       {activeMiniGame && (
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 9999 }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 100000, pointerEvents: 'auto' }}>
           <Suspense fallback={
             <div className="minigame-overlay" style={{ display: 'flex', flexDirection: 'column', gap: '12px', color: '#ffffff' }}>
               <div style={{ width: '42px', height: '42px', border: '4px solid #10b981', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
               <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>Carregant minijoc...</span>
             </div>
           }>
-            {activeMiniGame === 'connect' && <ConnectTheDots onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
-            {activeMiniGame === 'slider' && <SliderBalance onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-            {activeMiniGame === 'heatPump' && <HeatPumpHarmony onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
-            {activeMiniGame === 'rhythm' && <RhythmGame onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-            {activeMiniGame === 'community' && <CommunityEnergy onComplete={(reduction) => completeLiberation(pendingNode?.id, reduction)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={pendingNode?.id === 'pavello_001' ? 70 : 20} backgroundOverride={pendingNode?.id === 'sala_nova_001' ? salaNovaBg : null} />}
-            {activeMiniGame === 'tycoon' && <PavelloTycoon onComplete={(reduction) => completeLiberation(pendingNode?.id, reduction)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={70} />}
-            {activeMiniGame === 'quiz' && <QuizSobirania onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-            {activeMiniGame === 'balance' && <BalanceEnergetic onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
-            {activeMiniGame === 'heatHaze' && <HeatHazeSabotage onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
-            {activeMiniGame === 'aquifer' && <AquiferDefense onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-            {activeMiniGame === 'evaporation' && <EvaporationRace onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
-            {activeMiniGame === 'aturemPlater' && <AturemPlater onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
+            {activeMiniGame === 'connect' && <ConnectTheDots key={pendingNode?.id || 'connect'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} targetNode={pendingNode} />}
+            {activeMiniGame === 'slider' && <SliderBalance key={pendingNode?.id || 'slider'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+            {activeMiniGame === 'heatPump' && <HeatPumpHarmony key={pendingNode?.id || 'heatPump'} onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
+            {activeMiniGame === 'rhythm' && <RhythmGame key={pendingNode?.id || 'rhythm'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+            {activeMiniGame === 'community' && <CommunityEnergy key={pendingNode?.id || 'community'} onComplete={(reduction) => completeLiberation(pendingNode?.id, reduction)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={pendingNode?.id === 'pavello_001' ? 70 : 20} backgroundOverride={pendingNode?.id === 'sala_nova_001' ? salaNovaBg : null} />}
+            {activeMiniGame === 'tycoon' && <PavelloTycoon key={pendingNode?.id || 'tycoon'} onComplete={(reduction) => completeLiberation(pendingNode?.id, reduction)} onClose={() => setActiveMiniGame(null)} maxPower={pendingNode?.power} rewardFactor={70} />}
+            {activeMiniGame === 'quiz' && <QuizSobirania key={pendingNode?.id || 'quiz'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+            {activeMiniGame === 'balance' && <BalanceEnergetic key={pendingNode?.id || 'balance'} onComplete={() => completeLiberation(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} />}
+            {activeMiniGame === 'heatHaze' && <HeatHazeSabotage key={pendingNode?.id || 'heatHaze'} onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} />}
+            {activeMiniGame === 'aquifer' && <AquiferDefense key={pendingNode?.id || 'aquifer'} onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
+            {activeMiniGame === 'evaporation' && <EvaporationRace key={pendingNode?.id || 'evaporation'} onComplete={() => completeBadNode(pendingNode?.id)} onClose={() => setActiveMiniGame(null)} onImpact={handleImpact} onPenalty={handlePenalty} />}
+            {activeMiniGame === 'aturemPlater' && <AturemPlater key="aturemPlater" onComplete={() => { setActiveMiniGame(null); setShowVictoryModal(true); }} onClose={() => setActiveMiniGame(null)} />}
           </Suspense>
         </div>
       )}

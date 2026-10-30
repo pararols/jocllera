@@ -92,8 +92,8 @@ const getSuitIcon = (isAttacking) => isAttacking ? suitAttackingIcon : suitWalki
 const liberatedRooftopIcon = (power, id) => new L.divIcon({
     className: 'liberated-roof-icon',
     html: `
-        <div data-rooftop-id="${id}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
-            <div style="
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+            <div class="roof-circle" style="
                 background: linear-gradient(135deg, #10b981 0%, #059669 100%);
                 border: 2.5px solid #ffffff;
                 border-radius: 50%;
@@ -104,7 +104,6 @@ const liberatedRooftopIcon = (power, id) => new L.divIcon({
                 justify-content: center;
                 box-shadow: 0 0 16px rgba(16, 185, 129, 0.95), 0 3px 8px rgba(0,0,0,0.4);
                 position: relative;
-                pointer-events: none;
             ">
                 <span style="font-size: 15px; line-height: 1;">⚡</span>
             </div>
@@ -120,7 +119,6 @@ const liberatedRooftopIcon = (power, id) => new L.divIcon({
                 margin-top: -5px;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.6);
                 letter-spacing: -0.3px;
-                pointer-events: none;
             ">
                 ${(power !== undefined ? power : 0).toFixed(1)}k
             </div>
@@ -135,8 +133,8 @@ const liberatedRooftopIcon = (power, id) => new L.divIcon({
 const pendingRooftopIcon = (power, id) => new L.divIcon({
     className: 'pending-roof-icon',
     html: `
-        <div data-rooftop-id="${id}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto;">
-            <div style="
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('${id}');}" style="width: 50px; height: 50px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer;">
+            <div class="roof-circle" style="
                 background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
                 border: 2.5px solid #cbd5e1;
                 border-radius: 50%;
@@ -148,7 +146,6 @@ const pendingRooftopIcon = (power, id) => new L.divIcon({
                 box-shadow: 0 3px 8px rgba(0,0,0,0.5), 0 0 10px rgba(59, 130, 246, 0.4);
                 color: #f8fafc;
                 font-size: 13px;
-                pointer-events: none;
             ">
                 ☀️
             </div>
@@ -163,7 +160,6 @@ const pendingRooftopIcon = (power, id) => new L.divIcon({
                 white-space: nowrap;
                 margin-top: -5px;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-                pointer-events: none;
             ">
                 ${(power !== undefined ? power : 0).toFixed(1)}k
             </div>
@@ -178,7 +174,7 @@ const pendingRooftopIcon = (power, id) => new L.divIcon({
 const getSalaNovaIcon = (isLiberated) => new L.divIcon({
     className: 'sala-nova-icon',
     html: `
-        <div data-rooftop-id="sala_nova_001" style="
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('sala_nova_001');}" class="roof-circle" style="
             background: ${isLiberated ? 'linear-gradient(135deg, #10b981, #047857)' : 'linear-gradient(135deg, #3b82f6, #1d4ed8)'};
             border: 3px solid ${isLiberated ? '#facc15' : '#ffffff'};
             border-radius: 50%;
@@ -190,9 +186,8 @@ const getSalaNovaIcon = (isLiberated) => new L.divIcon({
             justify-content: center;
             box-shadow: 0 0 18px ${isLiberated ? 'rgba(16, 185, 129, 0.95)' : 'rgba(59, 130, 246, 0.85)'};
             cursor: pointer;
-            pointer-events: auto;
         ">
-            <span style="font-size: 20px; line-height: 1; pointer-events: none;">🏛️</span>
+            <span style="font-size: 20px; line-height: 1;">🏛️</span>
             <span style="
                 position: absolute;
                 bottom: -7px;
@@ -204,7 +199,6 @@ const getSalaNovaIcon = (isLiberated) => new L.divIcon({
                 padding: 1px 5px;
                 white-space: nowrap;
                 border: 1px solid rgba(255,255,255,0.4);
-                pointer-events: none;
             ">${isLiberated ? 'ALLIBERADA' : 'ASSEMBLEA'}</span>
         </div>
     `,
@@ -217,7 +211,7 @@ const getSalaNovaIcon = (isLiberated) => new L.divIcon({
 const getPavelloIcon = (isLiberated) => new L.divIcon({
     className: 'pavello-icon',
     html: `
-        <div data-rooftop-id="pavello_001" style="
+        <div onclick="if(window.__triggerRooftop){window.__triggerRooftop('pavello_001');}" class="roof-circle" style="
             background: ${isLiberated ? 'linear-gradient(135deg, #f59e0b, #b45309)' : 'linear-gradient(135deg, #8b5cf6, #6d28d9)'};
             border: 3px solid ${isLiberated ? '#10b981' : '#ffffff'};
             border-radius: 50%;
@@ -229,9 +223,8 @@ const getPavelloIcon = (isLiberated) => new L.divIcon({
             justify-content: center;
             box-shadow: 0 0 20px ${isLiberated ? 'rgba(245, 158, 11, 0.95)' : 'rgba(139, 92, 246, 0.85)'};
             cursor: pointer;
-            pointer-events: auto;
         ">
-            <span style="font-size: 22px; line-height: 1; pointer-events: none;">🏟️</span>
+            <span style="font-size: 22px; line-height: 1;">🏟️</span>
             <span style="
                 position: absolute;
                 bottom: -7px;
@@ -243,7 +236,6 @@ const getPavelloIcon = (isLiberated) => new L.divIcon({
                 padding: 1px 5px;
                 white-space: nowrap;
                 border: 1px solid rgba(255,255,255,0.4);
-                pointer-events: none;
             ">${isLiberated ? 'COOPERATIVA' : 'PAVELLÓ'}</span>
         </div>
     `,
@@ -431,20 +423,7 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
     }, [liberatedNodes, lastInteraction]);
 
     return (
-        <div
-            className="map-wrapper"
-            style={{ height: '100vh', width: '100%', position: 'relative' }}
-            onClick={(e) => {
-                const roofEl = e.target.closest?.('[data-rooftop-id]');
-                if (roofEl) {
-                    const id = roofEl.getAttribute('data-rooftop-id');
-                    const inst = gisData.installations.find(i => i.id === id);
-                    if (inst) {
-                        handleLiberateAttempt(inst, null, { x: e.clientX, y: e.clientY });
-                    }
-                }
-            }}
-        >
+        <div className="map-wrapper" style={{ height: '100vh', width: '100%', position: 'relative' }}>
             {/* Filter applies ONLY to map tiles, preserving 100% saturation for markers & UI */}
             <style>{`
                 .leaflet-tile-pane {
@@ -458,16 +437,10 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                 .pending-roof-icon, .liberated-roof-icon, .sala-nova-icon, .pavello-icon {
                     cursor: pointer !important;
                 }
-                .pending-roof-icon:hover, .liberated-roof-icon:hover, .sala-nova-icon:hover, .pavello-icon:hover {
-                    z-index: 10000 !important;
-                    cursor: pointer !important;
-                }
-                /* Feedback suau de brillantor en passar el ratolí, sense cap moviment ni desplaçament */
-                .pending-roof-icon > div, .liberated-roof-icon > div, .sala-nova-icon > div, .pavello-icon > div {
-                    transition: filter 0.2s ease-out;
-                }
-                .pending-roof-icon:hover > div, .liberated-roof-icon:hover > div, .sala-nova-icon:hover > div, .pavello-icon:hover > div {
-                    filter: drop-shadow(0 0 10px #fbbf24) brightness(1.15);
+                /* Ressaltat net amb vora radiant instantani, sense filtres pesats ni canvis de z-index que bloquegin el clic */
+                .pending-roof-icon:hover .roof-circle, .liberated-roof-icon:hover .roof-circle, .sala-nova-icon:hover, .pavello-icon:hover {
+                    box-shadow: 0 0 16px #fbbf24 !important;
+                    border-color: #fbbf24 !important;
                 }
             `}</style>
 
@@ -571,14 +544,11 @@ const GameMap = ({ corruptionLevel, liberatedNodes, onLiberateNode, enemies, onE
                             icon={markerIcon}
                             zIndexOffset={zIndex}
                             eventHandlers={{
-                                click: (e) => {
-                                    if (e.originalEvent) {
-                                        e.originalEvent.stopPropagation();
-                                    }
+                                click: () => {
                                     if (attackingEnemy && onEnemyClick) {
                                         onEnemyClick(attackingEnemy.id);
                                     }
-                                    handleLiberateAttempt(inst, e.latlng, e.containerPoint);
+                                    handleLiberateAttempt(inst);
                                 }
                             }}
                         />
